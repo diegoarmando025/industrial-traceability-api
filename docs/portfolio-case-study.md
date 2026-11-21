@@ -1,4 +1,4 @@
-# Industrial Traceability API — Technical Case Study
+# PlantCore Traceability — Technical Case Study
 
 ## Problem
 
@@ -10,7 +10,7 @@ This independent demonstration models a small part of that workflow with fiction
 
 **Stack:** Laravel 13, PHP 8.4, Laravel Sanctum, Eloquent, SQLite for local development and tests, PHPUnit and GitHub Actions.
 
-The API exposes five versioned endpoints under `/api/v1`:
+The application provides a Blade/AdminLTE 4 web interface for session-based dashboard, box registration, scans, release and responsible-user history. Independently, the API exposes five versioned endpoints under `/api/v1`:
 
 - Register a box and associate it with a plant.
 - Retrieve the box's status.
@@ -44,6 +44,7 @@ The Postman steps were observed individually. This does **not** imply a clean, f
 
 | Resource | Purpose |
 | --- | --- |
+| [Web walkthrough](web-reviewer-guide.md) | Evaluate the browser workflow from login to release |
 | [API contract](openapi.json) | OpenAPI 3.0.3 route, schema and error documentation |
 | [Postman collection](postman/industrial-traceability.postman_collection.json) | Sequential real HTTP example |
 | [Postman setup](postman/README.md) | Local credentials and request setup |
