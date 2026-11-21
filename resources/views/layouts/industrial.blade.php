@@ -39,11 +39,7 @@
                             <i class="nav-icon bi bi-grid-1x2"></i><p>Resumen</p>
                         </a>
                     </li>
-                    <li class="nav-header text-uppercase small">Operaciones</li>
-                    <li class="nav-item"><span class="nav-link text-body-secondary"><i class="nav-icon bi bi-box-seam"></i><p>Cajas <small>(próximamente)</small></p></span></li>
-                    <li class="nav-item"><span class="nav-link text-body-secondary"><i class="nav-icon bi bi-upc-scan"></i><p>Escaneo <small>(próximamente)</small></p></span></li>
-                    <li class="nav-item"><span class="nav-link text-body-secondary"><i class="nav-icon bi bi-shield-check"></i><p>Liberación <small>(próximamente)</small></p></span></li>
-                </ul>
+                                                                            </ul>
             </nav>
         </div>
     </aside>
@@ -55,7 +51,6 @@
         </div>
         <div class="app-content"><div class="container-fluid">@yield('content')</div></div>
     </main>
-    <footer class="app-footer small text-secondary">Demostración técnica independiente · Datos ficticios</footer>
 </div>
 </body>
 </html>
