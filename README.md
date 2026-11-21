@@ -138,6 +138,10 @@ Response codes include `201` for successful creation or accepted scans, `422` fo
 
 Run `php artisan db:seed --class=TraceabilityDemoSeeder` after migrations to create fictional plants, users and boxes without publishing credentials. See [local demo instructions](docs/local-demo.md) for the records and safeguards.
 
+## Postman HTTP demo
+
+Import [the Postman collection](docs/postman/industrial-traceability.postman_collection.json) and follow the [local Postman setup guide](docs/postman/README.md). It runs a complete flow against your local server with scoped operator and supervisor tokens. No credentials are committed to the repository.
+
 ## End-to-end example
 
 See [the full integration workflow](docs/workflow-test.md) for an executable scenario covering registration, validation, rejection, cross-plant access, supervisor release and audit history.
