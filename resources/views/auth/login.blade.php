@@ -12,7 +12,6 @@
             <div class="card-header text-center py-3"><strong>PlantCore Traceability</strong></div>
             <div class="card-body">
                 <h1 class="h5 mb-2">Acceso a producción</h1>
-                <p class="small text-secondary mb-4">Ingresa con un usuario autorizado de planta.</p>
                 <form method="POST" action="{{ route('login.store') }}">
                     @csrf
                     <div class="mb-3">
@@ -29,7 +28,6 @@
                 </form>
             </div>
         </div>
-        <p class="text-center text-secondary small mt-3">Entorno de demostración · Sin registro público</p>
     </main>
 </body>
 </html>
