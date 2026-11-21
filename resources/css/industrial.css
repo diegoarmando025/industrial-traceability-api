@@ -11,3 +11,13 @@
 .app-content .card { border: 1px solid #e3e7eb; box-shadow: none; }
 .login-page { min-height: 100vh; }
 .login-box { width: min(400px, calc(100vw - 2rem)); }
+
+/* Compact dashboard density on smaller windows. */
+.app-content .small-box { min-height: 136px; margin-bottom: 0; }
+.app-content .small-box .inner { padding: 1rem 1.25rem; }
+.app-content .small-box .inner h3 { font-size: 1.75rem; margin-bottom: .35rem; }
+.app-content .small-box .inner p { font-size: .925rem; margin-bottom: 0; }
+.app-content .small-box .small-box-icon { opacity: .35; }
+.app-content .table { font-size: .9rem; }
+.app-content .table td, .app-content .table th { padding: .7rem .8rem; }
+.app-content .table td { overflow-wrap: anywhere; }
