@@ -38,7 +38,7 @@ A request must pass **both** the Sanctum token ability check and the plant membe
 Plant and membership provisioning is currently performed through trusted administrative code or Tinker only: there is no public endpoint for creating plants or assigning roles. For a local demo, after creating a user:
 
 ```php
-$plant = \\App\\Models\\Plant::create(['code' => 'QRO', 'name' => 'Demo Plant']);
+$plant = \App\Models\Plant::create(['code' => 'QRO', 'name' => 'Demo Plant']);
 $user->plants()->attach($plant->id, ['role' => 'supervisor']);
 ```
 
