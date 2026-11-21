@@ -39,7 +39,8 @@
                             <i class="nav-icon bi bi-grid-1x2"></i><p>Resumen</p>
                         </a>
                     </li>
-                                                                            </ul>
+                    <li class="nav-item"><a href="{{ route('boxes.index') }}" class="nav-link {{ request()->routeIs('boxes.*') ? 'active' : '' }}"><i class="nav-icon bi bi-box-seam"></i><p>Cajas</p></a></li>
+                </ul>
             </nav>
         </div>
     </aside>
