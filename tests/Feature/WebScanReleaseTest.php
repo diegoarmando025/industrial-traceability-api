@@ -88,6 +88,31 @@ class WebScanReleaseTest extends TestCase
         ])->assertStatus(409);
     }
 
+    public function test_box_history_shows_actor_for_scans_and_release(): void
+    {
+        [$user, $box] = $this->setupBox();
+
+        foreach ([
+            ['part_number', 'PN-100'],
+            ['serial_number', 'SN-200'],
+            ['package_label', 'BOX:BX-1234:PN-100:SN-200'],
+        ] as [$type, $value]) {
+            $this->actingAs($user)->post("/boxes/{$box->id}/scans", [
+                'scan_type' => $type,
+                'value' => $value,
+            ])->assertRedirect();
+        }
+
+        $this->actingAs($user)->post("/boxes/{$box->id}/release")->assertRedirect();
+
+        $this->actingAs($user)->get("/boxes/{$box->id}")
+            ->assertOk()
+            ->assertSee('Historial de operaciones')
+            ->assertSee($user->name)
+            ->assertSee('Caja liberada')
+            ->assertSee('BOX:BX-1234:PN-100:SN-200');
+    }
+
     public function test_viewer_cannot_submit_scans_or_release(): void
     {
         [$user, $box] = $this->setupBox('viewer');
