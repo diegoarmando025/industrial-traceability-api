@@ -1,0 +1,642 @@
+{
+  "info": {
+    "name": "Industrial Traceability API — local workflow",
+    "description": "Sequential local-only workflow for fictional plant operations. Set operator_token and supervisor_token as secret variables in a local Postman environment. Never export real tokens. Run the requests IN ORDER (collection Runner).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 Create box",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const code = \"DEMO-API-\" + Date.now() + \"-\" + Math.floor(Math.random() * 100000);",
+              "pm.collectionVariables.set(\"box_code\", code);",
+              "pm.collectionVariables.unset(\"box_id\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+              "const data = pm.response.json().data;",
+              "pm.test(\"Created box belongs to the selected plant\", function () { pm.expect(data.plant_id).to.eql(Number(pm.collectionVariables.get(\"plant_id\"))); pm.expect(data.status).to.eql(\"pending\"); });",
+              "pm.collectionVariables.set(\"box_id\", String(data.id));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{operator_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/boxes",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "boxes"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"plant_id\": \"{{plant_id}}\",\n  \"code\": \"{{box_code}}\",\n  \"part_number\": \"{{part_number}}\",\n  \"serial_number\": \"{{serial_number}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "02 Release blocked (missing scans)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });",
+              "pm.test(\"Three scans required\", function () { const data=pm.response.json().data; pm.expect(data.released).to.eql(false); pm.expect(data.pending_scans).to.have.members([\"part_number\",\"serial_number\",\"package_label\"]); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{supervisor_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/boxes/{{box_id}}/release",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "boxes",
+            "{{box_id}}",
+            "release"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "03 Reject wrong part number",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });",
+              "pm.test(\"Rejected scan is recorded\", function () { const data=pm.response.json().data; pm.expect(data.accepted).to.eql(false); pm.expect(data.scan_id).to.be.a(\"number\"); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{operator_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/boxes/{{box_id}}/scans",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "boxes",
+            "{{box_id}}",
+            "scans"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"scan_type\": \"part_number\",\n  \"value\": \"INCORRECT-DEMO\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "04 Accept part number",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+              "pm.test(\"Part number accepted\", function () { pm.expect(pm.response.json().data.accepted).to.eql(true); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{operator_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/boxes/{{box_id}}/scans",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "boxes",
+            "{{box_id}}",
+            "scans"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"scan_type\": \"part_number\",\n  \"value\": \"{{part_number}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "05 Accept serial number",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+              "pm.test(\"Serial number accepted\", function () { pm.expect(pm.response.json().data.accepted).to.eql(true); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{operator_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/boxes/{{box_id}}/scans",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "boxes",
+            "{{box_id}}",
+            "scans"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"scan_type\": \"serial_number\",\n  \"value\": \"{{serial_number}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "06 Accept package label",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+              "pm.test(\"Package label accepted\", function () { pm.expect(pm.response.json().data.accepted).to.eql(true); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{operator_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/boxes/{{box_id}}/scans",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "boxes",
+            "{{box_id}}",
+            "scans"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"scan_type\": \"package_label\",\n  \"value\": \"BOX:{{box_code}}:{{part_number}}:{{serial_number}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "07 Operator cannot release",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", function () { pm.response.to.have.status(403); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{operator_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/boxes/{{box_id}}/release",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "boxes",
+            "{{box_id}}",
+            "release"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "08 Supervisor releases box",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Box released\", function () { const data=pm.response.json().data; pm.expect(data.released).to.eql(true); pm.expect(data.pending_scans).to.be.empty; });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{supervisor_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/boxes/{{box_id}}/release",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "boxes",
+            "{{box_id}}",
+            "release"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "09 Check box and status",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Box is released\", function () { const data=pm.response.json().data; pm.expect(data.status).to.eql(\"released\"); pm.expect(data.code).to.eql(pm.collectionVariables.get(\"box_code\")); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{supervisor_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/boxes/{{box_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "boxes",
+            "{{box_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "10 Verify audit history",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Audit records include the rejected scan and release\", function () { const data=pm.response.json().data; pm.expect(data.scans).to.have.lengthOf(4); pm.expect(data.events.map(e => e.event_type)).to.eql([\"created\",\"release_blocked\",\"released\"]); pm.expect(data.scans.some(s => s.accepted === false && s.scanned_value === \"INCORRECT-DEMO\")).to.eql(true); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{supervisor_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/boxes/{{box_id}}/history",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "boxes",
+            "{{box_id}}",
+            "history"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "11 Duplicate release denied",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{supervisor_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/boxes/{{box_id}}/release",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "boxes",
+            "{{box_id}}",
+            "release"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    },
+    {
+      "key": "plant_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "box_code",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "box_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "part_number",
+      "value": "DEMO-PN-300",
+      "type": "string"
+    },
+    {
+      "key": "serial_number",
+      "value": "DEMO-SN-300",
+      "type": "string"
+    }
+  ]
+}
