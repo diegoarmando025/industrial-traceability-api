@@ -92,6 +92,10 @@ Use least-privilege Sanctum token abilities for each operation:
 
 Tokens missing an ability receive HTTP `403 Forbidden`. By default, Sanctum tokens created **without** an abilities list have wildcard (`*`) access; always specify the required abilities when provisioning tokens. These checks restrict **API token operations**, not access to a particular plant, customer, or individual box. First-party cookie-authenticated requests also need a separate authorization strategy before they can be supported safely.
 
+## OpenAPI contract
+
+The API contract is available at [`docs/openapi.json`](docs/openapi.json) (OpenAPI 3.0.3). It documents the five current HTTP endpoints, request bodies, responses, Sanctum Bearer authentication and plant access requirements. You can import the JSON file into an OpenAPI-compatible viewer or API client. This is a contract document, **not** a hosted Swagger UI or a public token-issuance service.
+
 ## Endpoints
 
 All routes have the `/api/v1` prefix.
@@ -146,7 +150,7 @@ This is a **technical demonstration**, not a production-ready manufacturing exec
 - No production-grade identity provisioning or token lifecycle workflow.
 - No external scanner, ERP, or MES integration.
 - Concurrent release behavior is transaction-based but has not been load-tested or verified on multiple database engines.
-- Continuous integration runs Laravel tests in GitHub Actions. An OpenAPI contract is a planned addition.
+- Continuous integration runs Laravel tests in GitHub Actions. OpenAPI is documented, but automated contract validation is not implemented yet.
 
 ## License and provenance
 
