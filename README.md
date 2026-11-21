@@ -10,7 +10,7 @@ Built as an independent, fictional industrial workflow demonstration. It does no
 
 The repository includes a server-rendered web interface built with Blade, Bootstrap 5, AdminLTE 4 and Vite. After signing in with a **local** seeded account, a reviewer can view a plant-scoped dashboard, create boxes, submit part-number/serial/package-label scans, inspect the complete history and release a validated box as a supervisor.
 
-The browser interface uses Laravel session authentication; the REST API remains separately protected by Sanctum Bearer token abilities. **The public repository is source code, not a hosted web demo**. [Run the complete web scenario locally](docs/web-reviewer-guide.md).
+The browser interface uses Laravel session authentication; the REST API remains separately protected by Sanctum Bearer token abilities. A [public read-only demonstration](https://traceability.devalejandre.com/demo) is available with fictional records. It does not expose the authenticated operations for creating, scanning or releasing boxes. For the complete write workflow, [run the application locally](docs/web-reviewer-guide.md).
 
 ## Stack
 
@@ -113,7 +113,11 @@ Tokens missing an ability receive HTTP `403 Forbidden`. By default, Sanctum toke
 
 ## OpenAPI contract
 
-The API contract is available at [`docs/openapi.json`](docs/openapi.json) (OpenAPI 3.0.3). It documents the five current HTTP endpoints, request bodies, responses, Sanctum Bearer authentication and plant access requirements. You can import the JSON file into an OpenAPI-compatible viewer or API client. This is a contract document, **not** a hosted Swagger UI or a public token-issuance service.
+The API contract is available at [`docs/openapi.json`](docs/openapi.json) (OpenAPI 3.0.3). It documents the five current HTTP endpoints, request bodies, responses, Sanctum Bearer authentication and plant access requirements. You can import the JSON file into an OpenAPI-compatible viewer or API client. This contract is validated automatically in GitHub Actions using `python3 scripts/validate_openapi.py` (JSON, local references, declared schemas and authentication) and `OpenApiContractTest` (actual Laravel routes and documented methods). It is **not** a hosted Swagger UI or a public token-issuance service.
+
+## Public demonstration
+
+[Open the read-only Traceability demo](https://traceability.devalejandre.com/demo). Three fictional scenarios show a successful release, a blocked release and incomplete validation. This read-only presentation is isolated from authenticated operations. [Production demo setup and rollback](docs/PUBLIC_READONLY_DEMO.md).
 
 ## Endpoints
 
@@ -185,7 +189,7 @@ This is a **technical demonstration**, not a production-ready manufacturing exec
 - No production-grade identity provisioning or token lifecycle workflow; browser accounts are provisioned locally for the demo.
 - No external scanner, ERP, or MES integration.
 - Concurrent release behavior is transaction-based but has not been load-tested or verified on multiple database engines.
-- Continuous integration runs Laravel tests in GitHub Actions. OpenAPI is documented, but automated contract validation is not implemented yet.
+- Continuous integration runs Laravel tests plus structural and route-parity OpenAPI checks. It does not yet perform exhaustive runtime response-schema verification across all error branches.
 
 ## License and provenance
 
