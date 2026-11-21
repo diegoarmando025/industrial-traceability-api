@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\Plant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -11,9 +12,15 @@ class TraceabilityApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    private int $plantId;
+
     private function authenticate(): void
     {
-        Sanctum::actingAs(User::factory()->create(), [
+        $plant = Plant::create(['code' => 'QRO', 'name' => 'Demo Plant']);
+        $this->plantId = $plant->id;
+        $user = User::factory()->create();
+        $user->plants()->attach($plant->id, ['role' => 'supervisor']);
+        Sanctum::actingAs($user, [
             'boxes:create',
             'boxes:read',
             'boxes:scan',
@@ -24,7 +31,7 @@ class TraceabilityApiTest extends TestCase
     private function box(): int
     {
         return $this->postJson('/api/v1/boxes', [
-            'code' => 'BX-0001', 'part_number' => 'PN-100', 'serial_number' => 'SN-200',
+            'plant_id' => $this->plantId, 'code' => 'BX-0001', 'part_number' => 'PN-100', 'serial_number' => 'SN-200',
         ])->assertCreated()->json('data.id');
     }
 
