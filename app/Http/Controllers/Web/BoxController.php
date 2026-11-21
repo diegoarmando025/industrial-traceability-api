@@ -87,8 +87,8 @@ class BoxController extends Controller
     {
         $this->access->authorize($request->user(), (int) $box->plant_id, 'read');
         $box->load('plant:id,code,name');
-        $scans = $box->scans()->orderByDesc('id')->limit(20)->get();
-        $events = $box->events()->orderByDesc('id')->limit(20)->get();
+        $scans = $box->scans()->with('user:id,name')->orderByDesc('id')->limit(20)->get();
+        $events = $box->events()->with('user:id,name')->orderByDesc('id')->limit(20)->get();
 
         $latest = $box->scans()->orderByDesc('id')->get()->unique('scan_type')->keyBy('scan_type');
         $pendingScans = array_values(array_filter(
