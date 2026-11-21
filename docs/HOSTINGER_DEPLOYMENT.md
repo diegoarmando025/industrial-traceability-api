@@ -110,7 +110,7 @@ The subdomain's `.htaccess` must preserve the PHP 8.4 handler and Laravel's rewr
 ```apache
 DirectoryIndex index.php
 
-<FilesMatch "\\.(php|phtml)$">
+<FilesMatch "\.(php|phtml)$">
     SetHandler application/x-lsphp84
 </FilesMatch>
 
@@ -118,7 +118,7 @@ DirectoryIndex index.php
     Options -MultiViews -Indexes
     RewriteEngine On
 
-    RewriteCond %{HTTP_HOST} !^traceability\\.devalejandre\\.com$ [NC]
+    RewriteCond %{HTTP_HOST} !^traceability\.devalejandre\.com$ [NC]
     RewriteRule ^ - [F,L]
 
     RewriteCond %{HTTP:Authorization} .
