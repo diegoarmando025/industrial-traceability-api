@@ -8,7 +8,7 @@
     <div><h2 class="h5 mb-1">{{ $box->code }}</h2><div class="text-secondary small">{{ $box->plant->name }}</div></div>
     <span class="badge fs-6 {{ $box->status === 'released' ? 'text-bg-success' : 'text-bg-warning' }}">{{ $box->status === 'released' ? 'Liberada' : 'Pendiente' }}</span>
 </div>
-<div class="card mb-3"><div class="card-body">
+<div class="card mb-3"><div class="card-body py-3">
     <div class="row g-3"><div class="col-md-4"><div class="text-secondary small">Número de parte</div><div class="fw-semibold">{{ $box->part_number }}</div></div><div class="col-md-4"><div class="text-secondary small">Número de serie</div><div class="fw-semibold">{{ $box->serial_number }}</div></div><div class="col-md-4"><div class="text-secondary small">Registrada</div><div>{{ $box->created_at?->format('d/m/Y H:i') }}</div></div></div>
 </div></div>
 @if ($box->status !== 'released')
@@ -61,9 +61,56 @@
     </div>
 </div>
 @endif
-<div class="row g-3">
-    <div class="col-lg-7"><div class="card h-100"><div class="card-header"><h3 class="card-title">Lecturas recientes</h3></div><div class="card-body p-0"><div class="table-responsive"><table class="table mb-0"><thead><tr><th>Tipo</th><th>Valor</th><th>Resultado</th></tr></thead><tbody>@forelse($scans as $scan)<tr><td>{{ match($scan->scan_type) { 'part_number' => 'Parte', 'serial_number' => 'Serie', default => 'Empaque' } }}</td><td class="text-break">{{ $scan->scanned_value }}</td><td><span class="badge {{ $scan->accepted ? 'text-bg-success' : 'text-bg-danger' }}">{{ $scan->accepted ? 'Válida' : 'Rechazada' }}</span></td></tr>@empty<tr><td colspan="3" class="text-secondary text-center py-3">Sin lecturas</td></tr>@endforelse</tbody></table></div></div></div></div>
-    <div class="col-lg-5"><div class="card h-100"><div class="card-header"><h3 class="card-title">Actividad reciente</h3></div><div class="card-body p-0"><div class="table-responsive"><table class="table mb-0"><thead><tr><th>Evento</th><th>Fecha</th></tr></thead><tbody>@forelse($events as $event)<tr><td>{{ match($event->event_type) { 'created' => 'Registro', 'released' => 'Liberación', 'release_blocked' => 'Liberación bloqueada', default => $event->event_type } }}</td><td>{{ $event->created_at?->format('d/m/Y H:i') }}</td></tr>@empty<tr><td colspan="2" class="text-secondary text-center py-3">Sin actividad</td></tr>@endforelse</tbody></table></div></div></div></div>
+<div class="card mb-3">
+    <div class="card-header"><h3 class="card-title">Lecturas recientes</h3></div>
+    <div class="card-body p-0"><div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 scan-history-table">
+            <thead><tr><th class="scan-type-cell">Tipo</th><th>Valor leído</th><th>Resultado</th><th>Usuario</th><th>Fecha</th></tr></thead>
+            <tbody>
+            @forelse ($scans as $scan)
+                <tr>
+                    <td class="scan-type-cell">{{ match($scan->scan_type) { 'part_number' => 'Parte', 'serial_number' => 'Serie', default => 'Empaque' } }}</td>
+                    <td class="scan-value-cell">{{ $scan->scanned_value }}</td>
+                    <td><span class="badge {{ $scan->accepted ? 'text-bg-success' : 'text-bg-danger' }}">{{ $scan->accepted ? 'Válida' : 'Rechazada' }}</span></td>
+                    <td>{{ $scan->user?->name ?? 'Usuario no disponible' }}</td>
+                    <td class="text-nowrap">{{ $scan->created_at?->format('d/m/Y H:i') }}</td>
+                </tr>
+            @empty
+                <tr><td colspan="5" class="text-secondary text-center py-3">Sin lecturas</td></tr>
+            @endforelse
+            </tbody>
+        </table>
+    </div></div>
+</div>
+<div class="card">
+    <div class="card-header"><h3 class="card-title">Historial de operaciones</h3></div>
+    <div class="card-body p-0"><div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead><tr><th>Evento</th><th>Usuario</th><th>Fecha</th><th>Detalle</th></tr></thead>
+            <tbody>
+            @forelse ($events as $event)
+                <tr>
+                    <td>{{ match($event->event_type) { 'created' => 'Registro', 'released' => 'Liberación', 'release_blocked' => 'Liberación bloqueada', default => $event->event_type } }}</td>
+                    <td>{{ $event->user?->name ?? 'Usuario no disponible' }}</td>
+                    <td class="text-nowrap">{{ $event->created_at?->format('d/m/Y H:i') }}</td>
+                    <td>
+                        @if ($event->event_type === 'release_blocked')
+                            Faltantes: {{ implode(', ', $event->details['pending_scans'] ?? []) }}
+                        @elseif ($event->event_type === 'released')
+                            Caja liberada
+                        @elseif ($event->event_type === 'created')
+                            Caja registrada
+                        @else
+                            —
+                        @endif
+                    </td>
+                </tr>
+            @empty
+                <tr><td colspan="4" class="text-secondary text-center py-3">Sin actividad</td></tr>
+            @endforelse
+            </tbody>
+        </table>
+    </div></div>
 </div>
 <div class="mt-3"><a href="{{ route('boxes.index') }}" class="btn btn-outline-secondary">Volver a cajas</a></div>
 @endsection
