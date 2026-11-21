@@ -1,0 +1,727 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Industrial Traceability API",
+    "version": "1.0.0",
+    "description": "Independent industrial workflow demonstration. This contract documents observed controller behavior, including plant roles and Sanctum abilities. It is not a production-ready MES API."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8000",
+      "description": "Local Laravel development server"
+    }
+  ],
+  "security": [
+    {
+      "sanctumBearer": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Boxes",
+      "description": "Box registration and details"
+    },
+    {
+      "name": "Scans",
+      "description": "Scanned identifier validation"
+    },
+    {
+      "name": "Release",
+      "description": "Release controls and audit"
+    }
+  ],
+  "paths": {
+    "/api/v1/boxes": {
+      "post": {
+        "tags": [
+          "Boxes"
+        ],
+        "operationId": "createBox",
+        "summary": "Register a box in an authorized plant",
+        "description": "Requires token ability boxes:create and operator or supervisor membership in the supplied plant. Codes are globally unique in this demo.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "plant_id",
+                  "code",
+                  "part_number",
+                  "serial_number"
+                ],
+                "properties": {
+                  "plant_id": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "example": 1
+                  },
+                  "code": {
+                    "type": "string",
+                    "maxLength": 60,
+                    "example": "BX-0001"
+                  },
+                  "part_number": {
+                    "type": "string",
+                    "maxLength": 80,
+                    "example": "PN-100"
+                  },
+                  "serial_number": {
+                    "type": "string",
+                    "maxLength": 80,
+                    "example": "SN-200"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Box created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Box"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Token ability or plant role does not authorize the operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource missing or plant not assigned to the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request validation failed, including duplicate box code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/boxes/{box}": {
+      "get": {
+        "tags": [
+          "Boxes"
+        ],
+        "operationId": "getBox",
+        "summary": "Get box details",
+        "description": "Requires boxes:read and membership in the box plant (viewer, operator or supervisor).",
+        "parameters": [
+          {
+            "name": "box",
+            "in": "path",
+            "required": true,
+            "description": "Numeric box ID",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Box details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Box"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Token ability or plant role does not authorize the operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource missing or plant not assigned to the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/boxes/{box}/scans": {
+      "post": {
+        "tags": [
+          "Scans"
+        ],
+        "operationId": "scanBox",
+        "summary": "Record and validate an identifier",
+        "description": "Requires boxes:scan and plant operator or supervisor role. The latest scan of each type governs release eligibility. Rejected scans are persisted. Scanning a released box returns 409.",
+        "parameters": [
+          {
+            "name": "box",
+            "in": "path",
+            "required": true,
+            "description": "Numeric box ID",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "scan_type",
+                  "value"
+                ],
+                "properties": {
+                  "scan_type": {
+                    "type": "string",
+                    "enum": [
+                      "part_number",
+                      "serial_number",
+                      "package_label"
+                    ],
+                    "example": "package_label"
+                  },
+                  "value": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "example": "BOX:BX-0001:PN-100:SN-200"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Scan accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ScanResult"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Token ability or plant role does not authorize the operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource missing or plant not assigned to the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Box already released",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Scan rejected (or request validation failed)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ScanResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/boxes/{box}/release": {
+      "post": {
+        "tags": [
+          "Release"
+        ],
+        "operationId": "releaseBox",
+        "summary": "Attempt box release",
+        "description": "Requires boxes:release and supervisor membership in the box plant. Only the latest valid scan of each required type qualifies. Blocked releases are audit events. A second release returns 409.",
+        "parameters": [
+          {
+            "name": "box",
+            "in": "path",
+            "required": true,
+            "description": "Numeric box ID",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Box released",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ReleaseResult"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Token ability or plant role does not authorize the operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource missing or plant not assigned to the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Release blocked due to missing or invalid scans, or box already released",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "required": [
+                        "data"
+                      ],
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/ReleaseResult"
+                        }
+                      }
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/boxes/{box}/history": {
+      "get": {
+        "tags": [
+          "Release"
+        ],
+        "operationId": "getBoxHistory",
+        "summary": "Retrieve box scan and event history",
+        "description": "Requires boxes:read and membership in the box plant.",
+        "parameters": [
+          {
+            "name": "box",
+            "in": "path",
+            "required": true,
+            "description": "Numeric box ID",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Audit events and scan history",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "events",
+                        "scans"
+                      ],
+                      "properties": {
+                        "events": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/BoxEvent"
+                          }
+                        },
+                        "scans": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/BoxScan"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Token ability or plant role does not authorize the operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource missing or plant not assigned to the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "sanctumBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "Sanctum personal access token",
+        "description": "Token abilities: boxes:create, boxes:read, boxes:scan, boxes:release. Plant membership role is checked separately."
+      }
+    },
+    "schemas": {
+      "Box": {
+        "type": "object",
+        "required": [
+          "id",
+          "plant_id",
+          "code",
+          "part_number",
+          "serial_number",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 7
+          },
+          "plant_id": {
+            "type": "integer",
+            "nullable": true,
+            "example": 1
+          },
+          "code": {
+            "type": "string",
+            "example": "BX-0001"
+          },
+          "part_number": {
+            "type": "string",
+            "example": "PN-100"
+          },
+          "serial_number": {
+            "type": "string",
+            "example": "SN-200"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "released"
+            ]
+          },
+          "released_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ScanResult": {
+        "type": "object",
+        "required": [
+          "scan_id",
+          "accepted",
+          "reason"
+        ],
+        "properties": {
+          "scan_id": {
+            "type": "integer",
+            "example": 12
+          },
+          "accepted": {
+            "type": "boolean",
+            "example": true
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          }
+        }
+      },
+      "ReleaseResult": {
+        "type": "object",
+        "required": [
+          "released",
+          "pending_scans"
+        ],
+        "properties": {
+          "released": {
+            "type": "boolean",
+            "example": false
+          },
+          "pending_scans": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "part_number",
+                "serial_number",
+                "package_label"
+              ]
+            },
+            "example": [
+              "part_number"
+            ]
+          }
+        }
+      },
+      "BoxScan": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "box_id": {
+            "type": "integer"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "scan_type": {
+            "type": "string"
+          },
+          "scanned_value": {
+            "type": "string"
+          },
+          "accepted": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BoxEvent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "box_id": {
+            "type": "integer"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "event_type": {
+            "type": "string",
+            "enum": [
+              "created",
+              "released",
+              "release_blocked"
+            ]
+          },
+          "details": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
