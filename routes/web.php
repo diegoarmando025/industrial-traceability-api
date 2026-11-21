@@ -19,4 +19,6 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/boxes/create', [BoxController::class, 'create'])->name('boxes.create');
     Route::post('/boxes', [BoxController::class, 'store'])->name('boxes.store');
     Route::get('/boxes/{box}', [BoxController::class, 'show'])->name('boxes.show');
+    Route::post('/boxes/{box}/scans', [BoxController::class, 'scan'])->name('boxes.scans.store');
+    Route::post('/boxes/{box}/release', [BoxController::class, 'release'])->name('boxes.release');
 });
