@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\Plant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -11,9 +12,16 @@ class TraceabilityAuthorizationTest extends TestCase
 {
     use RefreshDatabase;
 
+    private ?int $plantId = null;
+
     private function actingWithAbilities(array $abilities): void
     {
-        Sanctum::actingAs(User::factory()->create(), $abilities);
+        if ($this->plantId === null) {
+            $this->plantId = Plant::create(['code' => 'QRO', 'name' => 'Demo Plant'])->id;
+        }
+        $user = User::factory()->create();
+        $user->plants()->attach($this->plantId, ['role' => 'supervisor']);
+        Sanctum::actingAs($user, $abilities);
     }
 
     private function createBoxAsAuthorizedUser(): int
@@ -21,6 +29,7 @@ class TraceabilityAuthorizationTest extends TestCase
         $this->actingWithAbilities(['boxes:create']);
 
         return $this->postJson('/api/v1/boxes', [
+            'plant_id' => $this->plantId,
             'code' => 'BX-AUTH-001',
             'part_number' => 'PN-100',
             'serial_number' => 'SN-200',
@@ -32,6 +41,7 @@ class TraceabilityAuthorizationTest extends TestCase
         $this->actingWithAbilities(['boxes:read']);
 
         $this->postJson('/api/v1/boxes', [
+            'plant_id' => $this->plantId,
             'code' => 'BX-DENIED',
             'part_number' => 'PN-100',
             'serial_number' => 'SN-200',

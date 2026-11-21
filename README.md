@@ -14,7 +14,7 @@ Built as an independent, fictional industrial workflow demonstration. It does no
 
 ## Workflow
 
-1. Register a box with a box code, part number, and serial number.
+1. Register a box with a plant ID, box code, part number, and serial number.
 2. Validate three scan types: `part_number`, `serial_number`, and `package_label`.
 3. Every scan is recorded, including rejected values.
 4. A release is permitted only when the **latest scan of each required type** is valid.
@@ -22,6 +22,27 @@ Built as an independent, fictional industrial workflow demonstration. It does no
 6. A released box cannot be scanned or released again.
 
 The expected package label in this demonstration follows the format `BOX:{code}:{part_number}:{serial_number}`.
+
+## Plant access model
+
+A box belongs to one plant. Users belong to explicitly assigned plants through a membership with one of three roles:
+
+| Role | Read | Create | Scan | Release |
+| --- | --- | --- | --- | --- |
+| viewer | Yes | No | No | No |
+| operator | Yes | Yes | Yes | No |
+| supervisor | Yes | Yes | Yes | Yes |
+
+A request must pass **both** the Sanctum token ability check and the plant membership/role check. Cross-plant access is returned as HTTP `404` to avoid disclosing box existence; insufficient role within a member plant returns `403`.
+
+Plant and membership provisioning is currently performed through trusted administrative code or Tinker only: there is no public endpoint for creating plants or assigning roles. For a local demo, after creating a user:
+
+```php
+$plant = \App\Models\Plant::create(['code' => 'QRO', 'name' => 'Demo Plant']);
+$user->plants()->attach($plant->id, ['role' => 'supervisor']);
+```
+
+Existing boxes with no assigned plant remain inaccessible until an administrator maps them to a valid plant. This migration preserves existing demo data instead of automatically guessing a plant.
 
 ## Quick start
 
@@ -91,6 +112,7 @@ Authorization: Bearer <token>
 Content-Type: application/json
 
 {
+  "plant_id": 1,
   "code": "BX-0001",
   "part_number": "PN-100",
   "serial_number": "SN-200"
@@ -114,13 +136,13 @@ Response codes include `201` for successful creation or accepted scans, `422` fo
 php artisan test
 ```
 
-The feature suite covers authentication, token abilities, blocked releases, rejected scans, a successful one-time release, and invalidation by a later incorrect scan.
+The feature suite covers authentication, token abilities, plant isolation and role permissions, blocked releases, rejected scans, a successful one-time release, and invalidation by a later incorrect scan.
 
 ## Current scope and limitations
 
 This is a **technical demonstration**, not a production-ready manufacturing execution system.
 
-- No plant/tenant isolation or resource-level role-based authorization; token abilities only restrict actions.
+- Plant-level access is enforced. There is no tenant/company hierarchy, centralized role provisioning interface, or independent per-box ACL.
 - No production-grade identity provisioning or token lifecycle workflow.
 - No external scanner, ERP, or MES integration.
 - Concurrent release behavior is transaction-based but has not been load-tested or verified on multiple database engines.
