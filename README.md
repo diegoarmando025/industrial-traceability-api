@@ -1,58 +1,118 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Industrial Traceability API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+REST API for registering production boxes, validating scanned identifiers, and controlling their release.
 
-## About Laravel
+Built as an independent, fictional industrial workflow demonstration. It does not include customer data, proprietary validation rules, or code from a production system.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Stack
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- PHP 8.3+
+- Laravel 13
+- Laravel Sanctum (Bearer token authentication)
+- SQLite for local development and automated tests
+- PHPUnit
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Workflow
 
-## Learning Laravel
+1. Register a box with a box code, part number, and serial number.
+2. Validate three scan types: `part_number`, `serial_number`, and `package_label`.
+3. Every scan is recorded, including rejected values.
+4. A release is permitted only when the **latest scan of each required type** is valid.
+5. Successful and blocked release attempts are recorded as events.
+6. A released box cannot be scanned or released again.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+The expected package label in this demonstration follows the format `BOX:{code}:{part_number}:{serial_number}`.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Quick start
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Requirements: PHP 8.3+ with SQLite support, Composer.
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/diegoarmando025/industrial-traceability-api.git
+cd industrial-traceability-api
+composer install
+cp .env.example .env
+php artisan key:generate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Create an empty `database/database.sqlite` file if it does not exist, and set `DB_CONNECTION=sqlite` in `.env`.
 
-## Contributing
+```bash
+php artisan migrate
+php artisan serve
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+On Windows PowerShell, use `Copy-Item .env.example .env` in place of `cp`; create the SQLite file with `New-Item database/database.sqlite -ItemType File` if it is missing.
 
-## Code of Conduct
+## Authentication
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Every API route requires a Laravel Sanctum Bearer token. This demo does **not** include a public login or token-issuance endpoint.
 
-## Security Vulnerabilities
+For local manual testing only, create a user and token using `php artisan tinker`:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```php
+$user = \App\Models\User::factory()->create();
+$token = $user->createToken('local-development')->plainTextToken;
+echo $token;
+```
 
-## License
+Keep the token private and never commit it to Git. Include it in requests as `Authorization: Bearer <token>`.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Endpoints
+
+All routes have the `/api/v1` prefix.
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| POST | `/boxes` | Create a box |
+| GET | `/boxes/{box}` | Show box details |
+| POST | `/boxes/{box}/scans` | Record and validate a scan |
+| POST | `/boxes/{box}/release` | Attempt box release |
+| GET | `/boxes/{box}/history` | Retrieve scans and audit events |
+
+Example box creation:
+
+```http
+POST /api/v1/boxes
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "code": "BX-0001",
+  "part_number": "PN-100",
+  "serial_number": "SN-200"
+}
+```
+
+Example scan:
+
+```json
+{
+  "scan_type": "package_label",
+  "value": "BOX:BX-0001:PN-100:SN-200"
+}
+```
+
+Response codes include `201` for successful creation or accepted scans, `422` for rejected scans or invalid request data, `409` for blocked release, and `401` for unauthenticated access.
+
+## Tests
+
+```bash
+php artisan test --filter=TraceabilityApiTest
+```
+
+The feature suite covers authentication, blocked releases, rejected scans, a successful one-time release, and invalidation by a later incorrect scan.
+
+## Current scope and limitations
+
+This is a **technical demonstration**, not a production-ready manufacturing execution system.
+
+- No plant/tenant isolation or role-based authorization.
+- No production-grade identity provisioning or token lifecycle workflow.
+- No external scanner, ERP, or MES integration.
+- Concurrent release behavior is transaction-based but has not been load-tested or verified on multiple database engines.
+- OpenAPI and continuous integration are planned additions.
+
+## License and provenance
+
+Developed as an independent portfolio demonstration using fictional identifiers and generic validation rules.
