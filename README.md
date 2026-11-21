@@ -4,6 +4,8 @@ REST API for registering production boxes, validating scanned identifiers, and c
 
 Built as an independent, fictional industrial workflow demonstration. It does not include customer data, proprietary validation rules, or code from a production system.
 
+**Start here:** [Technical case study](docs/portfolio-case-study.md) · [OpenAPI contract](docs/openapi.json) · [Postman collection](docs/postman/industrial-traceability.postman_collection.json) · [Reproducible local demo](docs/local-demo.md)
+
 ## Stack
 
 - PHP 8.4.1+
@@ -153,6 +155,10 @@ php artisan test
 ```
 
 The feature suite covers authentication, token abilities, plant isolation and role permissions, blocked releases, rejected scans, a successful one-time release, and invalidation by a later incorrect scan.
+
+## Verification status
+
+The Laravel suite and GitHub Actions have been run successfully. The 11 Postman HTTP requests were also exercised individually against a local server with the expected status codes. A consolidated, all-green Postman Runner report has not been independently confirmed.
 
 ## Current scope and limitations
 
