@@ -140,7 +140,7 @@ class OpenApiRuntimeResponseTest extends TestCase
         $this->assertDatabaseHas('boxes', ['id' => $box->id, 'status' => 'pending']);
     }
 
-    public function test_role_denied_and_unauthorized_responses_match_contract(): void
+    public function test_role_denied_response_matches_contract(): void
     {
         $plant = Plant::create(['code' => 'QRO', 'name' => 'Test QRO']);
         $box = Box::create([
@@ -153,10 +153,9 @@ class OpenApiRuntimeResponseTest extends TestCase
         $this->authenticate($plant, 'viewer', ['boxes:read', 'boxes:release']);
 
         $this->verify('POST', '/api/v1/boxes/{box}/release', 403, $this->postJson("/api/v1/boxes/{$box->id}/release"));
-
-        // Use a separate guest test request without an authenticated Sanctum actor.
-        auth()->logout();
-        $this->app['auth']->forgetGuards();
-        $this->verify('GET', '/api/v1/boxes/{box}', 401, $this->getJson("/api/v1/boxes/{$box->id}"));
+    }
+    public function test_unauthenticated_response_matches_contract(): void
+    {
+        $this->verify('GET', '/api/v1/boxes/{box}', 401, $this->getJson('/api/v1/boxes/999'));
     }
 }
