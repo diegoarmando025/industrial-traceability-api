@@ -134,6 +134,10 @@ Example scan:
 
 Response codes include `201` for successful creation or accepted scans, `422` for rejected scans or invalid request data, `409` for blocked release, `401` for unauthenticated access, and `403` for missing token abilities.
 
+## Sample data for local evaluation
+
+Run `php artisan db:seed --class=TraceabilityDemoSeeder` after migrations to create fictional plants, users and boxes without publishing credentials. See [local demo instructions](docs/local-demo.md) for the records and safeguards.
+
 ## End-to-end example
 
 See [the full integration workflow](docs/workflow-test.md) for an executable scenario covering registration, validation, rejection, cross-plant access, supervisor release and audit history.
