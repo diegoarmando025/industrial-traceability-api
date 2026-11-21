@@ -2,7 +2,6 @@
 @section('title', 'Resumen')
 @section('page-title', 'Resumen de producción')
 @section('content')
-    <p class="text-secondary mb-4">Indicadores de las plantas asignadas a tu usuario.</p>
     <div class="row g-3 mb-4">
         <div class="col-sm-6 col-lg-4"><div class="small-box text-bg-primary"><div class="inner"><h3>{{ $counts['total'] }}</h3><p>Cajas registradas</p></div><div class="small-box-icon"><i class="bi bi-box-seam"></i></div></div></div>
         <div class="col-sm-6 col-lg-4"><div class="small-box text-bg-warning"><div class="inner"><h3>{{ $counts['pending'] }}</h3><p>Pendientes de liberación</p></div><div class="small-box-icon"><i class="bi bi-hourglass-split"></i></div></div></div>
