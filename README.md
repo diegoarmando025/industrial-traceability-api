@@ -1,10 +1,16 @@
-# Industrial Traceability API
+# PlantCore Traceability — Web + REST API
 
-REST API for registering production boxes, validating scanned identifiers, and controlling their release.
+Laravel application for registering production boxes, validating scanned identifiers, and controlling their release through a web interface and a versioned REST API.
 
 Built as an independent, fictional industrial workflow demonstration. It does not include customer data, proprietary validation rules, or code from a production system.
 
-**Start here:** [Technical case study](docs/portfolio-case-study.md) · [OpenAPI contract](docs/openapi.json) · [Postman collection](docs/postman/industrial-traceability.postman_collection.json) · [Reproducible local demo](docs/local-demo.md)
+**Start here:** [Web walkthrough](docs/web-reviewer-guide.md) · [Technical case study](docs/portfolio-case-study.md) · [OpenAPI contract](docs/openapi.json) · [Postman collection](docs/postman/industrial-traceability.postman_collection.json) · [Reproducible local demo](docs/local-demo.md)
+
+## Web application
+
+The repository includes a server-rendered web interface built with Blade, Bootstrap 5, AdminLTE 4 and Vite. After signing in with a **local** seeded account, a reviewer can view a plant-scoped dashboard, create boxes, submit part-number/serial/package-label scans, inspect the complete history and release a validated box as a supervisor.
+
+The browser interface uses Laravel session authentication; the REST API remains separately protected by Sanctum Bearer token abilities. **The public repository is source code, not a hosted web demo**. [Run the complete web scenario locally](docs/web-reviewer-guide.md).
 
 ## Stack
 
@@ -67,9 +73,20 @@ php artisan serve
 
 On Windows PowerShell, use `Copy-Item .env.example .env` in place of `cp`; create the SQLite file with `New-Item database/database.sqlite -ItemType File` if it is missing.
 
-## Authentication
+For browser use, install the front-end dependencies and build the assets before opening `/login`:
 
-Every API route requires a Laravel Sanctum Bearer token. This demo does **not** include a public login or token-issuance endpoint.
+```bash
+npm ci
+npm run build
+php artisan db:seed --class=TraceabilityDemoSeeder
+php artisan serve
+```
+
+The demo users have **random passwords**. Set your own local password using the steps in the [web walkthrough](docs/web-reviewer-guide.md).
+
+## API authentication
+
+Every API route requires a Laravel Sanctum Bearer token. This demo does **not** expose a public API token-issuance endpoint. Browser users sign in through a separate session-based `/login` form.
 
 For local manual testing only, create a user and token using `php artisan tinker`:
 
@@ -165,7 +182,7 @@ The Laravel suite and GitHub Actions have been run successfully. The 11 Postman 
 This is a **technical demonstration**, not a production-ready manufacturing execution system.
 
 - Plant-level access is enforced. There is no tenant/company hierarchy, centralized role provisioning interface, or independent per-box ACL.
-- No production-grade identity provisioning or token lifecycle workflow.
+- No production-grade identity provisioning or token lifecycle workflow; browser accounts are provisioned locally for the demo.
 - No external scanner, ERP, or MES integration.
 - Concurrent release behavior is transaction-based but has not been load-tested or verified on multiple database engines.
 - Continuous integration runs Laravel tests in GitHub Actions. OpenAPI is documented, but automated contract validation is not implemented yet.
