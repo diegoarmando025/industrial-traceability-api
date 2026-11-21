@@ -13,7 +13,12 @@ class TraceabilityApiTest extends TestCase
 
     private function authenticate(): void
     {
-        Sanctum::actingAs(User::factory()->create());
+        Sanctum::actingAs(User::factory()->create(), [
+            'boxes:create',
+            'boxes:read',
+            'boxes:scan',
+            'boxes:release',
+        ]);
     }
 
     private function box(): int
