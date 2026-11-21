@@ -17,7 +17,7 @@ This optional visitor-facing view uses fictional records from `TRACE-PUBLIC` onl
 Create a verified backup of the **Traceability** MariaDB database before running the new seed. Do not touch the LPA database or change APP_ENV.
 
 ```bash
-cd /home/u641948971/domains/devalejandre.com/apps/traceability
+cd /path/to/private-laravel-project
 git status --short
 git pull --ff-only origin main
 /opt/alt/php84/usr/bin/php artisan optimize:clear
