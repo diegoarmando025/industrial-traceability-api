@@ -34,7 +34,9 @@ table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:13px;bor
 @if($event->event_type==='release_blocked')
 Faltan validaciones: {{ implode(', ', $event->details['pending_scans'] ?? []) }}
 @elseif($event->event_type==='released')Validaciones completas
-@elseRegistro inicial de la caja@endif
+@else
+Registro inicial de la caja
+@endif
 </td></tr>
 @empty<tr><td colspan="3">Sin eventos.</td></tr>@endforelse
 </tbody></table></div></section>
