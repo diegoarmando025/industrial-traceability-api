@@ -26,8 +26,8 @@ cd "$APP"
 
 [[ "$(git branch --show-current)" == "main" ]] || { echo "Expected main checkout" >&2; exit 2; }
 [[ -z "$(git status --porcelain --untracked-files=no)" ]] || { echo "Tracked files modified on server; refusing deployment" >&2; exit 2; }
-grep -Eq '^APP_ENV=["\x27]?production["\x27]? { echo "APP_ENV must be production" >&2; exit 2; }
-grep -Eq '^APP_DEBUG=["\x27]?false["\x27]? { echo "APP_DEBUG must be false" >&2; exit 2; }
+grep -qx 'APP_ENV=production' .env || { echo "APP_ENV must be production" >&2; exit 2; }
+grep -qx 'APP_DEBUG=false' .env || { echo "APP_DEBUG must be false" >&2; exit 2; }
 
 LOCK="$APP/storage/app/hostinger-deploy.lock"
 mkdir -p "$APP/storage/app"
