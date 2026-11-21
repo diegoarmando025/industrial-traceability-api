@@ -51,5 +51,8 @@ jobs:
       - name: Compile Vite assets
         run: npm run build
 
-      - name: Run automated tests
+      - name: Validate OpenAPI JSON and schema references
+        run: python3 scripts/validate_openapi.py
+
+      - name: Run automated tests (including route-contract parity)
         run: php artisan test
