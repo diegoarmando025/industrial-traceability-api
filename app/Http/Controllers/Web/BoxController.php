@@ -90,6 +90,45 @@ class BoxController extends Controller
         $scans = $box->scans()->orderByDesc('id')->limit(20)->get();
         $events = $box->events()->orderByDesc('id')->limit(20)->get();
 
-        return view('boxes.show', compact('box', 'scans', 'events'));
+        $latest = $box->scans()->orderByDesc('id')->get()->unique('scan_type')->keyBy('scan_type');
+        $pendingScans = array_values(array_filter(
+            TraceabilityService::SCAN_TYPES,
+            fn (string $type): bool => ! $latest->has($type) || ! $latest->get($type)->accepted
+        ));
+        $role = $request->user()->plants()->whereKey($box->plant_id)->firstOrFail()->pivot->role;
+        $canScan = in_array($role, ['operator', 'supervisor'], true) && $box->status !== 'released';
+        $canRelease = $role === 'supervisor' && $box->status !== 'released';
+
+        return view('boxes.show', compact('box', 'scans', 'events', 'pendingScans', 'canScan', 'canRelease'));
+    }
+    public function scan(Request $request, Box $box): RedirectResponse
+    {
+        $this->access->authorize($request->user(), (int) $box->plant_id, 'scan');
+
+        $data = $request->validate([
+            'scan_type' => ['required', Rule::in(TraceabilityService::SCAN_TYPES)],
+            'value' => ['required', 'string', 'max:255'],
+        ]);
+
+        $result = $this->traceability->scan($box, $data['scan_type'], $data['value'], $request->user()->id);
+
+        return redirect()->route('boxes.show', $box)->with(
+            $result['accepted'] ? 'status' : 'warning',
+            $result['accepted'] ? 'Lectura válida.' : 'Lectura rechazada: el valor no coincide.'
+        );
+    }
+
+    public function release(Request $request, Box $box): RedirectResponse
+    {
+        $this->access->authorize($request->user(), (int) $box->plant_id, 'release');
+
+        $result = $this->traceability->release($box, $request->user()->id);
+
+        return redirect()->route('boxes.show', $box)->with(
+            $result['released'] ? 'status' : 'warning',
+            $result['released']
+                ? 'Caja liberada.'
+                : 'No se puede liberar. Faltan lecturas válidas: '.implode(', ', $result['pending_scans']).'.'
+        );
     }
 }
