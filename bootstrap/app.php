@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 use Laravel\Sanctum\Http\Middleware\CheckAbilities;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -13,10 +14,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // API consumers receive JSON errors even when requesting HTML.
+        $middleware->redirectGuestsTo(
+            fn (Request $request): ?string => $request->is('api/*') ? null : route('login')
+        );
+
         $middleware->alias([
             'abilities' => CheckAbilities::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->shouldRenderJsonWhen(
+            fn (Request $request, \Throwable $e): bool => $request->is('api/*') || $request->expectsJson()
+        );
     })->create();
