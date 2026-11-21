@@ -1,0 +1,13 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+@import 'admin-lte/dist/css/adminlte.min.css';
+
+:root {
+    --bs-primary: #243b53;
+    --bs-primary-rgb: 36, 59, 83;
+}
+.brand-text { letter-spacing: -.025em; }
+.app-content-header { padding-top: 1.5rem; padding-bottom: .75rem; }
+.app-content .card { border: 1px solid #e3e7eb; box-shadow: none; }
+.login-page { min-height: 100vh; }
+.login-box { width: min(400px, calc(100vw - 2rem)); }
