@@ -29,8 +29,8 @@ basada en la planta.
 
 Cada perfil soporta únicamente los tres tipos existentes:
 `part_number`, `serial_number`, `package_label`, más un prefijo fijo de
-1 a 16 caracteres `A-Z`, dígitos, guiones y guion bajo. No permite cargar código
-arbitrario ni patrones libres.
+1 a 16 caracteres `A-Z`, dígitos, guiones y guion bajo. También ofrece dos formatos de etiqueta de empaque permitidos: `colon` (`PREFIJO:CAJA:PARTE:SERIE`) y `pipe` (`PREFIJO|PARTE|SERIE|CAJA`). El formato anterior sigue siendo el predeterminado. Las cajas con `pipe` rechazan valores que contienen `|` para evitar lecturas ambiguas. No permite cargar código
+arbitrario ni patrones libres. La configuración del formato se guarda en la copia inmutable de reglas de cada caja. Esta entrega no requiere migraciones nuevas ni compilación Vite.
 
 ## Seguridad y límites
 

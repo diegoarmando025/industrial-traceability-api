@@ -7,6 +7,7 @@ use App\Models\Plant;
 use App\Models\PlantCustomerProfile;
 use App\Support\BoxValidationRules;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class TraceabilityService
@@ -25,6 +26,15 @@ class TraceabilityService
                     ->findOrFail($data['customer_profile_id']);
             }
             $rules = BoxValidationRules::normalize($profile?->validation_rules ?? $plant->validation_rules);
+            if (($rules['package_label_format'] ?? 'colon') === 'pipe') {
+                foreach (['code', 'part_number', 'serial_number'] as $field) {
+                    if (str_contains($data[$field], '|')) {
+                        throw ValidationException::withMessages([
+                            $field => 'El campo no puede contener | cuando se utiliza el formato alternativo.',
+                        ]);
+                    }
+                }
+            }
             $box = Box::query()->create([
                 'plant_id' => $plant->id,
                 'customer_profile_id' => $profile?->id,

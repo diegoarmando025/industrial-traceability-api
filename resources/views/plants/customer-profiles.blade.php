@@ -26,6 +26,13 @@
                         @endforeach
                     </fieldset>
                     <div class="mb-3"><label class="form-label" for="package_label_prefix">Prefijo de etiqueta</label><input class="form-control" name="package_label_prefix" id="package_label_prefix" maxlength="16" pattern="[A-Z0-9_-]{1,16}" value="{{ old('package_label_prefix', 'BOX') }}" required></div>
+                    <div class="mb-3"><label for="package_label_format" class="form-label">Formato de etiqueta de empaque</label>
+                        <select id="package_label_format" class="form-select" name="package_label_format" required>
+                            <option value="colon" @selected(old('package_label_format', 'colon') === 'colon')>Estándar: PREFIJO:CAJA:PARTE:SERIE</option>
+                            <option value="pipe" @selected(old('package_label_format') === 'pipe')>Alternativo: PREFIJO|PARTE|SERIE|CAJA</option>
+                        </select>
+                        <div class="form-text">No se permiten expresiones libres ni formatos personalizados.</div>
+                    </div>
                     <button type="submit" class="btn btn-primary">Crear perfil</button>
                 </form>
             </div>
@@ -40,7 +47,7 @@
                 @forelse($profiles as $profile)
                 <tr>
                     <td><strong>{{ $profile->name }}</strong><div class="small text-secondary">{{ $profile->code }}</div></td>
-                    <td>{{ implode(', ', $profile->validation_rules['required_scans']) }}<div class="small text-secondary">Prefijo: {{ $profile->validation_rules['package_label_prefix'] }}</div></td>
+                    <td>{{ implode(', ', $profile->validation_rules['required_scans']) }}<div class="small text-secondary">Prefijo: {{ $profile->validation_rules['package_label_prefix'] }} · Formato: {{ ($profile->validation_rules['package_label_format'] ?? 'colon') === 'pipe' ? 'Alternativo' : 'Estándar' }}</div></td>
                     <td><span class="badge {{ $profile->active ? 'text-bg-success' : 'text-bg-secondary' }}">{{ $profile->active ? 'Activo' : 'Inactivo' }}</span></td>
                     <td class="text-end">
                         @if($profile->active)
