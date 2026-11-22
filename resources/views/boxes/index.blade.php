@@ -4,6 +4,7 @@
 @section('content')
 <div class="d-flex justify-content-end mb-3">
     @if ($canCreate)
+        <a href="{{ route('boxes.import.create') }}" class="btn btn-outline-primary me-2"><i class="bi bi-upload me-1"></i>Importar CSV</a>
         <a href="{{ route('boxes.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Nueva caja</a>
     @endif
 </div>
