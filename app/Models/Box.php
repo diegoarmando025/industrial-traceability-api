@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Box extends Model
 {
-    protected $fillable = ['plant_id', 'code', 'part_number', 'serial_number', 'status', 'released_at'];
+    protected $fillable = ['plant_id', 'code', 'part_number', 'serial_number', 'status', 'released_at', 'validation_rules'];
 
     protected function casts(): array
     {
-        return ['released_at' => 'datetime'];
+        return ['released_at' => 'datetime', 'validation_rules' => 'array'];
     }
 
     public function plant(): BelongsTo

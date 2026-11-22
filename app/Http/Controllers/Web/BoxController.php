@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Box;
 use App\Services\TraceabilityService;
 use App\Support\PlantAccess;
+use App\Support\BoxValidationRules;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -90,11 +91,7 @@ class BoxController extends Controller
         $scans = $box->scans()->with('user:id,name')->orderByDesc('id')->limit(20)->get();
         $events = $box->events()->with('user:id,name')->orderByDesc('id')->limit(20)->get();
 
-        $latest = $box->scans()->orderByDesc('id')->get()->unique('scan_type')->keyBy('scan_type');
-        $pendingScans = array_values(array_filter(
-            TraceabilityService::SCAN_TYPES,
-            fn (string $type): bool => ! $latest->has($type) || ! $latest->get($type)->accepted
-        ));
+        $pendingScans = BoxValidationRules::pending($box);
         $role = $request->user()->plants()->whereKey($box->plant_id)->firstOrFail()->pivot->role;
         $canScan = in_array($role, ['operator', 'supervisor'], true) && $box->status !== 'released';
         $canRelease = $role === 'supervisor' && $box->status !== 'released';
