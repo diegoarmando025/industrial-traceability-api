@@ -20,7 +20,7 @@ final class BoxValidationRules
     {
         $rules ??= self::DEFAULT;
 
-        if (array_diff(array_keys($rules), array_keys(self::DEFAULT)) !== []) {
+        if (array_diff(array_keys($rules), [...array_keys(self::DEFAULT), 'package_label_format']) !== []) {
             throw new InvalidArgumentException('Unsupported validation rule key.');
         }
 
