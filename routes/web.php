@@ -3,6 +3,8 @@
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\OperationalReportController;
 use App\Http\Controllers\Web\BoxController;
+use App\Http\Controllers\Web\BoxImportController;
+use App\Http\Controllers\Web\TeamController;
 use App\Http\Controllers\Web\BoxHistoryController;
 use App\Http\Controllers\Web\SessionController;
 use Illuminate\Support\Facades\Route;
@@ -38,6 +40,12 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/plants/{plant}/customers/{profile}/deactivate', [PlantCustomerProfileController::class, 'deactivate'])->name('plants.customers.deactivate');
     Route::post('/logout', [SessionController::class, 'destroy'])->name('logout');
     Route::get('/boxes', [BoxController::class, 'index'])->name('boxes.index');
+    Route::get('/boxes/import', [BoxImportController::class, 'create'])->name('boxes.import.create');
+    Route::post('/boxes/import', [BoxImportController::class, 'store'])->name('boxes.import.store');
+    Route::get('/team', [TeamController::class, 'index'])->name('team.index');
+    Route::post('/team', [TeamController::class, 'store'])->name('team.store');
+    Route::put('/team/{user}', [TeamController::class, 'update'])->name('team.update');
+    Route::delete('/team/{user}', [TeamController::class, 'revoke'])->name('team.revoke');
     Route::get('/boxes/create', [BoxController::class, 'create'])->name('boxes.create');
     Route::post('/boxes', [BoxController::class, 'store'])->name('boxes.store');
     Route::get('/boxes/{box}', [BoxController::class, 'show'])->name('boxes.show');
