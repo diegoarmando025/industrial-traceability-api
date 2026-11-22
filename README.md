@@ -187,7 +187,7 @@ The Laravel suite and GitHub Actions have been run successfully. The 11 Postman 
 
 ## Current scope and limitations
 
-This is a **technical demonstration**, not a production-ready manufacturing execution system.
+The repository demonstrates an end-to-end traceability workflow, including plant-scoped authorization, validation rules, event history, CSV reporting and a versioned API. Operational deployment requirements depend on the customer's environment and integrations.
 
 - Plant-level access is enforced. There is no tenant/company hierarchy, centralized role provisioning interface, or independent per-box ACL.
 - No production-grade identity provisioning or token lifecycle workflow; browser accounts are provisioned locally for the demo.
