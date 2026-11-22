@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Box;
+use App\Models\Plant;
+use App\Support\BoxValidationRules;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
@@ -13,7 +15,9 @@ class TraceabilityService
     public function create(array $data, int $userId): Box
     {
         return DB::transaction(function () use ($data, $userId): Box {
-            $box = Box::query()->create($data + ['status' => 'pending']);
+            $plant = Plant::query()->findOrFail($data['plant_id']);
+            $rules = BoxValidationRules::normalize($plant->validation_rules);
+            $box = Box::query()->create($data + ['status' => 'pending', 'validation_rules' => $rules]);
             $box->events()->create([
                 'user_id' => $userId,
                 'event_type' => 'created',
@@ -31,11 +35,7 @@ class TraceabilityService
             if ($locked->status === 'released') {
                 throw new ConflictHttpException('La caja ya fue liberada.');
             }
-            $expected = match ($type) {
-                'part_number' => $locked->part_number,
-                'serial_number' => $locked->serial_number,
-                'package_label' => 'BOX:' . $locked->code . ':' . $locked->part_number . ':' . $locked->serial_number,
-            };
+            $expected = BoxValidationRules::expectedValue($locked, $type);
             $accepted = hash_equals($expected, $value);
             $scan = $locked->scans()->create([
                 'user_id' => $userId,
@@ -56,10 +56,8 @@ class TraceabilityService
             if ($locked->status === 'released') {
                 throw new ConflictHttpException('La caja ya fue liberada.');
             }
-            $latest = $locked->scans()->orderByDesc('id')->get()->unique('scan_type')->keyBy('scan_type');
-            $missing = array_values(array_filter(self::SCAN_TYPES, fn (string $type): bool =>
-                ! $latest->has($type) || ! $latest->get($type)->accepted
-            ));
+            $rules = BoxValidationRules::forBox($locked);
+            $missing = BoxValidationRules::pending($locked);
             if ($missing !== []) {
                 $locked->events()->create([
                     'user_id' => $userId,
@@ -73,7 +71,7 @@ class TraceabilityService
             $locked->events()->create([
                 'user_id' => $userId,
                 'event_type' => 'released',
-                'details' => ['validated_scans' => self::SCAN_TYPES],
+                'details' => ['validated_scans' => $rules['required_scans']],
                 'created_at' => now(),
             ]);
             return ['released' => true, 'pending_scans' => []];
