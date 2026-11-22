@@ -6,8 +6,8 @@ use App\Models\Box;
 use App\Models\Plant;
 use App\Models\User;
 use App\Support\BoxValidationRules;
+use App\Services\TraceabilityService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -133,15 +133,17 @@ class PlantValidationRulesTest extends TestCase
         ]);
         $this->supervisor($plant);
 
-        $this->expectException(InvalidArgumentException::class);
         try {
-            $this->postJson('/api/v1/boxes', [
+            app(TraceabilityService::class)->create([
                 'plant_id' => $plant->id, 'code' => 'BAD-BOX',
                 'part_number' => 'PN-100', 'serial_number' => 'SN-200',
-            ]);
-        } finally {
-            $this->assertDatabaseMissing('boxes', ['code' => 'BAD-BOX']);
+            ], User::factory()->create()->id);
+            $this->fail('An invalid profile must fail closed.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame('Invalid required scan types.', $exception->getMessage());
         }
+
+        $this->assertDatabaseMissing('boxes', ['code' => 'BAD-BOX']);
     }
 
     public function test_other_plant_cannot_influence_validation_rules(): void
