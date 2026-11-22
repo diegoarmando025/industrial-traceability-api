@@ -32,13 +32,16 @@
 </div>
 <div class="row g-3">
     <div class="col-xl-8"><div class="card h-100">
-        <div class="card-header"><h2 class="h6 mb-0">Actividad diaria</h2></div>
+        <div class="card-header"><h2 class="h6 mb-0">Días con actividad</h2></div>
+        <div class="card-body px-3 pt-2 pb-0"><p class="text-secondary small mb-2">Solo se muestran fechas con operaciones. La exportación CSV conserva todos los días del periodo.</p></div>
         <div class="card-body p-0"><div class="table-responsive"><table class="table table-hover table-sm align-middle mb-0">
             <thead><tr><th>Fecha</th><th class="text-end">Registradas</th><th class="text-end">Liberadas</th><th class="text-end">Lecturas válidas</th><th class="text-end">Rechazadas</th></tr></thead>
             <tbody>
-            @foreach(array_reverse($days) as $day)
+            @forelse(array_reverse($activityDays) as $day)
                 <tr><td>{{ \Carbon\CarbonImmutable::parse($day['date'])->format('d/m/Y') }}</td><td class="text-end">{{ $day['registered'] }}</td><td class="text-end">{{ $day['released'] }}</td><td class="text-end">{{ $day['accepted'] }}</td><td class="text-end">{{ $day['rejected'] }}</td></tr>
-            @endforeach
+            @empty
+                <tr><td colspan="5" class="text-center text-secondary py-4">Sin operaciones en el periodo seleccionado. Prueba otro intervalo o registra una caja ficticia.</td></tr>
+            @endforelse
             </tbody></table></div></div>
     </div></div>
     <div class="col-xl-4"><div class="card">
