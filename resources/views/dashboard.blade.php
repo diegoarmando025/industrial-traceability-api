@@ -9,7 +9,7 @@
         <p class="text-secondary mb-0">Del registro a la liberación: identifica cajas pendientes, valida sus lecturas y consulta cada movimiento.</p>
     </div>
     <div class="ops-intro-actions">
-        <a href="{{ route('boxes.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Registrar caja</a>
+        @if($canCreate)<a href="{{ route('boxes.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Registrar caja</a>@endif
         <a href="{{ route('reports.operations.index') }}" class="btn btn-outline-secondary"><i class="bi bi-graph-up me-1"></i> Consultar reportes</a>
     </div>
 </section>
