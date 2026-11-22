@@ -52,12 +52,14 @@ class PlantValidationRulesController extends Controller
             'required_scans' => ['required', 'array', 'min:1', 'max:3'],
             'required_scans.*' => ['required', 'string', 'distinct', Rule::in(BoxValidationRules::SCAN_TYPES)],
             'package_label_prefix' => ['required', 'string', 'regex:/^[A-Z0-9_-]{1,16}$/D'],
+            'package_label_format' => ['sometimes', 'string', Rule::in(BoxValidationRules::LABEL_FORMATS)],
             'version' => ['required', 'integer', 'min:0'],
         ]);
 
         $incoming = BoxValidationRules::normalize([
             'required_scans' => $data['required_scans'],
             'package_label_prefix' => $data['package_label_prefix'],
+            'package_label_format' => $data['package_label_format'] ?? 'colon',
         ]);
 
         // Normalize order so selecting identical options does not create audit noise.
