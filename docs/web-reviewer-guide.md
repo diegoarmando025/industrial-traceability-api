@@ -1,6 +1,6 @@
 # Technical reviewer walkthrough — PlantCore Traceability
 
-This guide evaluates the actual Laravel web application included in this repository. All identifiers below are fictional; there is no public hosted installation or link to client systems.
+This guide evaluates the actual Laravel web application included in this repository. All identifiers below are fictional. A public interactive demonstration is available at https://traceability.devalejandre.com/login; the steps below also apply to a disposable local installation.
 
 ## Prepare a clean local installation
 
@@ -63,7 +63,7 @@ Use screenshots from the running application (not mockups): dashboard, list of b
 
 ## Architectural boundaries
 
-This sample is not a deployed MES or production-ready identity service. There is no public hosted instance, ERP integration, production scanner connection or third-party customer data. Consult the [technical case study](portfolio-case-study.md) for access rules and known constraints.
+The public demonstration showcases core box-validation and release workflows using fictional records. Integration with scanners, ERP/MES systems, and identity providers requires project-specific implementation and verification. Consult the [technical case study](portfolio-case-study.md) for architecture and integration boundaries.
 
 ## Related independent project
 
