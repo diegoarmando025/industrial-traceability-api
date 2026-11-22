@@ -26,7 +26,7 @@ final class BoxValidationRules
 
         $required = $rules['required_scans'] ?? self::DEFAULT['required_scans'];
         $prefix = $rules['package_label_prefix'] ?? self::DEFAULT['package_label_prefix'];
-        $format = $rules['package_label_format'] ?? self::DEFAULT['package_label_format'];
+        $format = $rules['package_label_format'] ?? 'colon';
 
         if (! is_array($required) || ! array_is_list($required)
             || $required === [] || count($required) !== count(array_unique($required))
