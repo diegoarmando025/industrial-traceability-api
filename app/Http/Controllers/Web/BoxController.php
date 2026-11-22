@@ -66,7 +66,11 @@ class BoxController extends Controller
 
         abort_if($plants->isEmpty(), 403);
 
-        return view('boxes.create', compact('plants'));
+        $profiles = \App\Models\PlantCustomerProfile::query()
+            ->whereIn('plant_id', $plants->pluck('id'))
+            ->where('active', true)->orderBy('code')->get();
+
+        return view('boxes.create', compact('plants', 'profiles'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -76,6 +80,7 @@ class BoxController extends Controller
             'code' => ['required', 'string', 'max:60', 'unique:boxes,code'],
             'part_number' => ['required', 'string', 'max:80'],
             'serial_number' => ['required', 'string', 'max:80'],
+            'customer_profile_id' => ['nullable', 'integer', 'min:1'],
         ]);
 
         $this->access->authorize($request->user(), (int) $data['plant_id'], 'create');
