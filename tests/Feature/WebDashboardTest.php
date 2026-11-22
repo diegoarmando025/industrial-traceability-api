@@ -44,7 +44,8 @@ class WebDashboardTest extends TestCase
             ->assertOk()
             ->assertSee('VISIBLE-001')
             ->assertDontSee('HIDDEN-001')
-            ->assertSee('Cajas registradas');
+            ->assertSee('Cajas registradas')
+            ->assertDontSee('Registrar caja');
     }
 
     public function test_logout_ends_web_session(): void

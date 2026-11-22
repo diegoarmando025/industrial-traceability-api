@@ -11,7 +11,9 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request): View
     {
-        $plantIds = $request->user()->plants()->pluck('plants.id');
+        $plants = $request->user()->plants()->get(['plants.id']);
+        $plantIds = $plants->pluck('id');
+        $canCreate = $plants->contains(fn ($plant) => in_array($plant->pivot->role, ['operator', 'supervisor'], true));
 
         $visibleBoxes = Box::query()->whereIn('plant_id', $plantIds);
 
@@ -24,6 +26,6 @@ class DashboardController extends Controller
         $boxes = $visibleBoxes->with('plant:id,code,name')
             ->latest('id')->limit(10)->get();
 
-        return view('dashboard', compact('counts', 'boxes'));
+        return view('dashboard', compact('counts', 'boxes', 'canCreate'));
     }
 }
