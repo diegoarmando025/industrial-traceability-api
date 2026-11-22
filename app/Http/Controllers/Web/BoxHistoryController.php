@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\Box;
 use App\Support\PlantAccess;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Http\StreamedResponse;
 use Illuminate\Validation\Rule;
@@ -26,7 +26,7 @@ class BoxHistoryController extends Controller
         ]);
     }
 
-    private function records(Box $box, array $filters): Builder
+    private function records(Box $box, array $filters): HasMany
     {
         $kind = $filters['kind'] ?? 'scans';
         $query = $kind === 'events' ? $box->events() : $box->scans();
