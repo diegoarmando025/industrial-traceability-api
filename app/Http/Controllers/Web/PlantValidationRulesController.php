@@ -81,10 +81,10 @@ class PlantValidationRulesController extends Controller
             }
 
             $nextVersion = $locked->validation_rules_version + 1;
-            $locked->update([
-                'validation_rules' => $incoming,
-                'validation_rules_version' => $nextVersion,
-            ]);
+            // Version is internal, never mass-assignable from user input.
+            $locked->validation_rules = $incoming;
+            $locked->validation_rules_version = $nextVersion;
+            $locked->save();
 
             PlantValidationRuleChange::query()->create([
                 'plant_id' => $locked->id,
