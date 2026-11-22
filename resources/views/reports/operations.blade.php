@@ -30,6 +30,22 @@
     <div class="col-sm-6 col-xl-4"><div class="card h-100"><div class="card-body"><div class="small text-secondary">{{ $label }}</div><div class="display-6 fw-semibold text-{{ $color }}">{{ $value }}</div></div></div></div>
     @endforeach
 </div>
+@if($kpis['scans'] > 0)
+<div class="card mb-3">
+    <div class="card-body py-3">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+            <div><div class="fw-semibold">Resultados de lectura</div><div class="small text-secondary">Distribución de lecturas válidas y rechazadas en el periodo seleccionado</div></div>
+            <span class="small fw-semibold">{{ $kpis['scans'] }} lecturas</span>
+        </div>
+        @php($acceptedPct=round(100 * ($kpis['scans'] - $kpis['rejected']) / $kpis['scans'],1))
+        <div class="progress" role="progressbar" aria-label="Lecturas válidas" aria-valuenow="{{ $acceptedPct }}" aria-valuemin="0" aria-valuemax="100" style="height:12px">
+            <div class="progress-bar bg-success" style="width:{{ $acceptedPct }}%"></div>
+            <div class="progress-bar bg-danger" style="width:{{ 100 - $acceptedPct }}%"></div>
+        </div>
+        <div class="d-flex flex-wrap gap-3 small text-secondary mt-2"><span><i class="bi bi-circle-fill text-success me-1"></i> Válidas: {{ $kpis['scans'] - $kpis['rejected'] }}</span><span><i class="bi bi-circle-fill text-danger me-1"></i> Rechazadas: {{ $kpis['rejected'] }}</span></div>
+    </div>
+</div>
+@endif
 <div class="row g-3">
     <div class="col-xl-8"><div class="card h-100">
         <div class="card-header"><h2 class="h6 mb-0">Días con actividad</h2></div>
