@@ -5,7 +5,7 @@
 @if (session('status'))<div class="alert alert-success py-2">{{ session('status') }}</div>@endif
 @if (session('warning'))<div class="alert alert-warning py-2">{{ session('warning') }}</div>@endif
 <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-3">
-    <div><h2 class="h5 mb-1">{{ $box->code }}</h2><div class="text-secondary small">{{ $box->plant->name }}</div></div>
+    <div><h2 class="h5 mb-1">{{ $box->code }}</h2><div class="text-secondary small">{{ $box->plant->name }} @if($box->customerProfile) · Perfil: {{ $box->customerProfile->code }} @endif</div></div>
     <span class="badge fs-6 {{ $box->status === 'released' ? 'text-bg-success' : 'text-bg-warning' }}">{{ $box->status === 'released' ? 'Liberada' : 'Pendiente' }}</span>
 </div>
 <div class="card mb-3"><div class="card-body py-3">

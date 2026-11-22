@@ -20,6 +20,11 @@ class Plant extends Model
         return $this->belongsToMany(User::class)->withPivot('role');
     }
 
+    public function customerProfiles(): HasMany
+    {
+        return $this->hasMany(PlantCustomerProfile::class);
+    }
+
     public function boxes(): HasMany
     {
         return $this->hasMany(Box::class);
