@@ -121,7 +121,13 @@ class OperationalReportController extends Controller
 
     public function index(Request $request): View
     {
-        return view('reports.operations', $this->report($request));
+        $report = $this->report($request);
+        // Keep the CSV complete, but show meaningful activity dates in the UI.
+        $report['activityDays'] = array_values(array_filter($report['days'], static fn (array $day): bool =>
+            $day['registered'] > 0 || $day['released'] > 0 || $day['accepted'] > 0 || $day['rejected'] > 0
+        ));
+
+        return view('reports.operations', $report);
     }
 
     public function export(Request $request): StreamedResponse
