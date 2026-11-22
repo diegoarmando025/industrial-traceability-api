@@ -24,6 +24,7 @@ class BoxController extends Controller
             'code' => ['required', 'string', 'max:60', 'unique:boxes,code'],
             'part_number' => ['required', 'string', 'max:80'],
             'serial_number' => ['required', 'string', 'max:80'],
+            'customer_profile_id' => ['nullable', 'integer', 'min:1'],
         ]);
 
         $this->access->authorize($request->user(), (int) $data['plant_id'], 'create');
