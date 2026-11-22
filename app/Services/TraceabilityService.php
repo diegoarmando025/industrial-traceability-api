@@ -56,12 +56,14 @@ class TraceabilityService
         });
     }
 
-    public function scan(Box $box, string $type, string $value, int $userId): array
+    public function scan(Box $box, string $type, string $value, int $userId, bool $trustedFixture = false): array
     {
-        return DB::transaction(function () use ($box, $type, $value, $userId): array {
+        return DB::transaction(function () use ($box, $type, $value, $userId, $trustedFixture): array {
             $locked = Box::query()->lockForUpdate()->findOrFail($box->id);
             // Membership is checked again against the locked box, not just the route-bound model.
-            app(PlantAccess::class)->authorize(User::query()->findOrFail($userId), (int) $locked->plant_id, 'scan');
+            if (! $trustedFixture) {
+                app(PlantAccess::class)->authorize(User::query()->findOrFail($userId), (int) $locked->plant_id, 'scan');
+            }
             if ($locked->status === 'released') {
                 throw new ConflictHttpException('La caja ya fue liberada.');
             }
@@ -79,12 +81,14 @@ class TraceabilityService
         });
     }
 
-    public function release(Box $box, int $userId): array
+    public function release(Box $box, int $userId, bool $trustedFixture = false): array
     {
-        return DB::transaction(function () use ($box, $userId): array {
+        return DB::transaction(function () use ($box, $userId, $trustedFixture): array {
             $locked = Box::query()->lockForUpdate()->findOrFail($box->id);
             // Membership is checked again against the locked box, not just the route-bound model.
-            app(PlantAccess::class)->authorize(User::query()->findOrFail($userId), (int) $locked->plant_id, 'release');
+            if (! $trustedFixture) {
+                app(PlantAccess::class)->authorize(User::query()->findOrFail($userId), (int) $locked->plant_id, 'release');
+            }
             if ($locked->status === 'released') {
                 throw new ConflictHttpException('La caja ya fue liberada.');
             }
