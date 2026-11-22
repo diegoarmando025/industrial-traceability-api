@@ -23,6 +23,7 @@
                     <div class="mb-3">
                         <label for="scan_type" class="form-label">Tipo de etiqueta</label>
                         <select class="form-select @error('scan_type') is-invalid @enderror" name="scan_type" id="scan_type" required>
+                            <option value="" @selected(old('scan_type') === null) disabled>Selecciona la etiqueta a validar</option>
                             <option value="part_number" @selected(old('scan_type') === 'part_number')>Número de parte</option>
                             <option value="serial_number" @selected(old('scan_type') === 'serial_number')>Número de serie</option>
                             <option value="package_label" @selected(old('scan_type') === 'package_label')>Etiqueta de empaque</option>
@@ -32,6 +33,7 @@
                     <div class="mb-3">
                         <label for="value" class="form-label">Lectura</label>
                         <input type="text" class="form-control @error('value') is-invalid @enderror" id="value" name="value" maxlength="255" value="{{ old('value') }}" autocomplete="off" required autofocus>
+                        <div class="form-text">Introduce el valor de la etiqueta correspondiente. La lectura se registrará en el historial, tanto si es válida como si se rechaza.</div>
                         @error('value')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <button type="submit" class="btn btn-primary"><i class="bi bi-upc-scan me-1"></i>Validar lectura</button>
@@ -50,10 +52,17 @@
                         <span class="badge {{ in_array($type, $pendingScans, true) ? 'text-bg-warning' : 'text-bg-success' }}">{{ in_array($type, $pendingScans, true) ? 'Pendiente' : 'Validada' }}</span>
                     </div>
                 @endforeach
+                <div class="small text-secondary mt-3" role="status" aria-live="polite">
+                    @if($pendingScans === [])
+                        <i class="bi bi-check-circle text-success me-1"></i> Validaciones completas. La caja está lista para liberación autorizada.
+                    @else
+                        <i class="bi bi-hourglass-split me-1"></i> Faltan {{ count($pendingScans) }} {{ count($pendingScans) === 1 ? 'validación' : 'validaciones' }} para habilitar la liberación.
+                    @endif
+                </div>
                 @if ($canRelease)
                     <form method="POST" action="{{ route('boxes.release', $box) }}" class="mt-3">
                         @csrf
-                        <button type="submit" class="btn btn-success w-100" @disabled($pendingScans !== [])>Liberar caja</button>
+                        <button type="submit" class="btn btn-success w-100" @disabled($pendingScans !== [])>{{ $pendingScans === [] ? 'Liberar caja' : 'Liberación pendiente de validaciones' }}</button>
                     </form>
                 @endif
             </div>
