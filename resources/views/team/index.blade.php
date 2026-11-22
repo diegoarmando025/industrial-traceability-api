@@ -18,6 +18,18 @@
 <div class="row gy-3"><div class="col-sm-4"><strong>Consulta</strong><p class="small text-secondary mb-0">Consulta historial, cajas e indicadores.</p></div><div class="col-sm-4"><strong>Operación</strong><p class="small text-secondary mb-0">Registra cajas y realiza lecturas.</p></div><div class="col-sm-4"><strong>Supervisión</strong><p class="small text-secondary mb-0">Libera cajas y configura validaciones.</p></div></div>
 <hr><p class="small text-secondary mb-0">Solo el propietario puede gestionar cuentas desde este panel. La cuenta demo y la cuenta propietaria no pueden modificarse aquí.</p>
 </div></div></div></div>
+
+<div class="row g-3 mb-4">
+<div class="col-lg-5"><div class="card h-100"><div class="card-header"><h2 class="h5 mb-0">Registrar planta</h2></div><div class="card-body"><form method="POST" action="{{ route('team.plants.store') }}">@csrf
+<div class="mb-3"><label class="form-label" for="plant_code">Código</label><input id="plant_code" name="code" maxlength="30" class="form-control" pattern="[A-Z0-9_-]{2,30}" placeholder="QRO-02" required></div>
+<div class="mb-3"><label class="form-label" for="plant_name">Nombre</label><input id="plant_name" name="name" maxlength="120" class="form-control" placeholder="Planta Querétaro II" required></div>
+<button class="btn btn-outline-primary">Crear planta</button></form></div></div></div>
+<div class="col-lg-7"><div class="card h-100"><div class="card-header"><h2 class="h5 mb-0">Asignar usuario existente</h2></div><div class="card-body"><form method="POST" action="{{ route('team.assign') }}">@csrf
+<div class="mb-3"><label class="form-label" for="assign_user">Usuario</label><select class="form-select" id="assign_user" name="user_id" required>@foreach($users as $user)<option value="{{ $user->id }}">{{ $user->name }} — {{ $user->email }}</option>@endforeach</select></div>
+<div class="row g-2 mb-3"><div class="col-sm-7"><label class="form-label" for="assign_plant">Planta</label><select class="form-select" id="assign_plant" name="plant_id">@foreach($plants as $plant)<option value="{{ $plant->id }}">{{ $plant->name }}</option>@endforeach</select></div>
+<div class="col-sm-5"><label class="form-label" for="assign_role">Rol</label><select class="form-select" name="role" id="assign_role"><option value="viewer">Consulta</option><option value="operator">Operación</option><option value="supervisor">Supervisión</option></select></div></div>
+<button class="btn btn-outline-primary" @disabled($users->isEmpty())>Asignar acceso</button></form></div></div></div>
+</div>
 <div class="card"><div class="card-header"><h2 class="h5 mb-0">Accesos asignados por planta</h2></div>
 <div class="card-body p-0"><div class="table-responsive"><table class="table table-hover align-middle mb-0">
 <thead><tr><th>Usuario</th><th>Planta</th><th>Rol</th><th>Administración</th></tr></thead><tbody>
