@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Box;
 use App\Models\Plant;
 use App\Models\PlantCustomerProfile;
+use App\Models\User;
+use App\Support\PlantAccess;
 use App\Support\BoxValidationRules;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -18,6 +20,7 @@ class TraceabilityService
     {
         return DB::transaction(function () use ($data, $userId): Box {
             $plant = Plant::query()->findOrFail($data['plant_id']);
+            app(PlantAccess::class)->authorize(User::query()->findOrFail($userId), (int) $plant->id, 'create');
             $profile = null;
             if (! empty($data['customer_profile_id'])) {
                 $profile = PlantCustomerProfile::query()
@@ -58,6 +61,8 @@ class TraceabilityService
     {
         return DB::transaction(function () use ($box, $type, $value, $userId): array {
             $locked = Box::query()->lockForUpdate()->findOrFail($box->id);
+            // Membership is checked again against the locked box, not just the route-bound model.
+            app(PlantAccess::class)->authorize(User::query()->findOrFail($userId), (int) $locked->plant_id, 'scan');
             if ($locked->status === 'released') {
                 throw new ConflictHttpException('La caja ya fue liberada.');
             }
@@ -79,6 +84,8 @@ class TraceabilityService
     {
         return DB::transaction(function () use ($box, $userId): array {
             $locked = Box::query()->lockForUpdate()->findOrFail($box->id);
+            // Membership is checked again against the locked box, not just the route-bound model.
+            app(PlantAccess::class)->authorize(User::query()->findOrFail($userId), (int) $locked->plant_id, 'release');
             if ($locked->status === 'released') {
                 throw new ConflictHttpException('La caja ya fue liberada.');
             }
