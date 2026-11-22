@@ -1,6 +1,6 @@
 # Technical reviewer walkthrough — PlantCore Traceability
 
-This guide evaluates the actual Laravel web application included in this repository. All identifiers below are fictional; there is no public hosted installation or link to client systems.
+This guide evaluates the actual Laravel web application included in this repository. All identifiers below are fictional. A public interactive demonstration is available at https://traceability.devalejandre.com/login; the steps below also apply to a disposable local installation.
 
 ## Prepare a clean local installation
 
