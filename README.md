@@ -4,13 +4,17 @@ Laravel application for registering production boxes, validating scanned identif
 
 Built as an independent, fictional industrial workflow demonstration. It does not include customer data, proprietary validation rules, or code from a production system.
 
+**Live interactive demo:** [Open Traceability](https://traceability.devalejandre.com/login) and choose **Entrar como administrador demo**. Create fictional boxes, scan valid or invalid identifiers, release a validated box, and consult history and operational reports. The visitor uses the real app with plant-scoped permissions and shared fictional data; no confidential customer records are included.
+
+[Reviewer walkthrough](docs/INTERACTIVE_PORTFOLIO_DEMO.md) · [OpenAPI specification](docs/openapi.json) · [LPA live demo](https://lpa.devalejandre.com/login) · [Service Desk live demo](https://service-desk.devalejandre.com/login).
+
 **Start here:** [Web walkthrough](docs/web-reviewer-guide.md) · [Technical case study](docs/portfolio-case-study.md) · [OpenAPI contract](docs/openapi.json) · [Postman collection](docs/postman/industrial-traceability.postman_collection.json) · [Reproducible local demo](docs/local-demo.md)
 
 ## Web application
 
 The repository includes a server-rendered web interface built with Blade, Bootstrap 5, AdminLTE 4 and Vite. After signing in with a **local** seeded account, a reviewer can view a plant-scoped dashboard, create boxes, submit part-number/serial/package-label scans, inspect the complete history and release a validated box as a supervisor.
 
-The browser interface uses Laravel session authentication; the REST API remains separately protected by Sanctum Bearer token abilities. A [public read-only demonstration](https://traceability.devalejandre.com/demo) is available with fictional records. It does not expose the authenticated operations for creating, scanning or releasing boxes. For the complete write workflow, [run the application locally](docs/web-reviewer-guide.md).
+The browser interface uses Laravel session authentication; the REST API remains separately protected by Sanctum Bearer token abilities. An [interactive hosted demo](https://traceability.devalejandre.com/login) supports the full fictional write workflow. A [read-only public overview](https://traceability.devalejandre.com/demo) is also available.
 
 ## Stack
 
