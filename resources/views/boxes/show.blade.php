@@ -112,5 +112,5 @@
         </table>
     </div></div>
 </div>
-<div class="mt-3"><a href="{{ route('boxes.index') }}" class="btn btn-outline-secondary">Volver a cajas</a></div>
+<div class="mt-3"><a href="{{ route('boxes.index') }}" class="btn btn-outline-secondary">Volver a cajas</a> <a class="btn btn-primary ms-2" href="{{ route('boxes.history.index', $box) }}">Historial completo y CSV</a></div>
 @endsection

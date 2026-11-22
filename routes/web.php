@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\BoxController;
+use App\Http\Controllers\Web\BoxHistoryController;
 use App\Http\Controllers\Web\SessionController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\PublicDemoController;
@@ -33,6 +34,8 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/boxes/create', [BoxController::class, 'create'])->name('boxes.create');
     Route::post('/boxes', [BoxController::class, 'store'])->name('boxes.store');
     Route::get('/boxes/{box}', [BoxController::class, 'show'])->name('boxes.show');
+    Route::get('/boxes/{box}/history', [BoxHistoryController::class, 'index'])->name('boxes.history.index');
+    Route::get('/boxes/{box}/history/export', [BoxHistoryController::class, 'export'])->name('boxes.history.export');
     Route::post('/boxes/{box}/scans', [BoxController::class, 'scan'])->name('boxes.scans.store');
     Route::post('/boxes/{box}/release', [BoxController::class, 'release'])->name('boxes.release');
 });
