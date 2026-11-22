@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\OperationalReportController;
 use App\Http\Controllers\Web\BoxController;
 use App\Http\Controllers\Web\BoxHistoryController;
 use App\Http\Controllers\Web\SessionController;
