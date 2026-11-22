@@ -7,7 +7,7 @@
     <link rel="icon" href="https://devalejandre.com/assets/brand/favicon.ico" sizes="any">
     @vite(['resources/css/industrial.css', 'resources/js/industrial.js'])
 </head>
-<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary" data-bs-theme="light">
 <div class="app-wrapper">
     <nav class="app-header navbar navbar-expand bg-body border-bottom">
         <div class="container-fluid">
