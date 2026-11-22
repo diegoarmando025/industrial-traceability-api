@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\OperationalReportController;
 use App\Http\Controllers\Web\BoxController;
 use App\Http\Controllers\Web\BoxHistoryController;
 use App\Http\Controllers\Web\SessionController;
@@ -27,6 +28,8 @@ Route::middleware('guest')->group(function (): void {
 Route::middleware('auth')->group(function (): void {
     Route::get('/guia', [PortfolioDemoController::class, 'guide'])->name('portfolio.guide');
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::get('/reports/operations', [OperationalReportController::class, 'index'])->name('reports.operations.index');
+    Route::get('/reports/operations/export', [OperationalReportController::class, 'export'])->name('reports.operations.export');
     Route::get('/plants/validation', [PlantValidationRulesController::class, 'index'])->name('plants.validation.index');
     Route::get('/plants/{plant}/validation', [PlantValidationRulesController::class, 'edit'])->name('plants.validation.edit');
     Route::put('/plants/{plant}/validation', [PlantValidationRulesController::class, 'update'])->name('plants.validation.update');
