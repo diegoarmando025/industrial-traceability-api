@@ -35,11 +35,13 @@ class PlantCustomerProfileController extends Controller
             'required_scans' => ['required', 'array', 'min:1', 'max:3'],
             'required_scans.*' => ['required', 'string', 'distinct', Rule::in(BoxValidationRules::SCAN_TYPES)],
             'package_label_prefix' => ['required', 'string', 'regex:/^[A-Z0-9_-]{1,16}$/D'],
+            'package_label_format' => ['required', 'string', Rule::in(BoxValidationRules::LABEL_FORMATS)],
         ]);
 
         $rules = BoxValidationRules::normalize([
             'required_scans' => $data['required_scans'],
             'package_label_prefix' => $data['package_label_prefix'],
+            'package_label_format' => $data['package_label_format'],
         ]);
         $rules['required_scans'] = array_values(array_filter(
             BoxValidationRules::SCAN_TYPES,
