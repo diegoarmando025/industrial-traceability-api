@@ -40,6 +40,7 @@ class TeamController extends Controller
             'email' => ['required', 'email', 'max:255'],
             'plant_id' => ['required', 'integer', 'exists:plants,id'],
             'role' => ['required', Rule::in(['viewer', 'operator', 'supervisor'])],
+            'password' => ['required', 'string', 'min:16', 'max:200'],
         ]);
         $email = strtolower(trim($data['email']));
         $existing = User::query()->where('email', $email)->first();
@@ -49,15 +50,12 @@ class TeamController extends Controller
             return back()->withErrors(['email' => 'El correo ya existe. Usa la sección de asignaciones para gestionar accesos.'])->withInput();
         }
         DB::transaction(function () use ($data, $email): void {
-            $password = \Illuminate\Support\Str::random(64);
-            $user = User::create(['name' => $data['name'], 'email' => $email, 'password' => $password]);
+            $user = User::create(['name' => $data['name'], 'email' => $email, 'password' => $data['password']]);
             DB::table('plant_user')->insert([
                 'plant_id' => $data['plant_id'], 'user_id' => $user->id, 'role' => $data['role'],
             ]);
         });
-        // No credentials emailed or published. Onboarding requires a controlled
-        // password setup flow before this account can be used to sign in.
-        return back()->with('status', 'Usuario creado sin acceso inicial. Configura su contraseña mediante un proceso privado antes de entregarlo.');
+        return back()->with('status', 'Usuario creado. Entrégale su contraseña inicial por un canal privado.');
     }
 
     public function update(Request $request, User $user): RedirectResponse
