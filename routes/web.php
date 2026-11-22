@@ -5,6 +5,7 @@ use App\Http\Controllers\Web\OperationalReportController;
 use App\Http\Controllers\Web\BoxController;
 use App\Http\Controllers\Web\BoxImportController;
 use App\Http\Controllers\Web\TeamController;
+use App\Http\Controllers\Web\PlantAdministrationController;
 use App\Http\Controllers\Web\BoxHistoryController;
 use App\Http\Controllers\Web\SessionController;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +43,8 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/boxes', [BoxController::class, 'index'])->name('boxes.index');
     Route::get('/boxes/import', [BoxImportController::class, 'create'])->name('boxes.import.create');
     Route::post('/boxes/import', [BoxImportController::class, 'store'])->name('boxes.import.store');
+    Route::post('/team/plants', [PlantAdministrationController::class, 'store'])->name('team.plants.store');
+    Route::post('/team/assign', [PlantAdministrationController::class, 'assign'])->name('team.assign');
     Route::get('/team', [TeamController::class, 'index'])->name('team.index');
     Route::post('/team', [TeamController::class, 'store'])->name('team.store');
     Route::put('/team/{user}', [TeamController::class, 'update'])->name('team.update');
