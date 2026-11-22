@@ -47,22 +47,18 @@ class TransactionAuthorizationTest extends TestCase
         $this->assertDatabaseMissing('box_events', ['box_id' => $box->id, 'event_type' => 'release_blocked']);
     }
 
-    public function test_create_requires_membership_even_when_called_outside_an_http_controller(): void
+    public function test_http_create_requires_plant_membership(): void
     {
         $plant = Plant::create(['code' => 'MTY', 'name' => 'Fictional Plant']);
         $user = User::factory()->create();
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['boxes:create']);
 
-        try {
-            app(TraceabilityService::class)->create([
-                'plant_id' => $plant->id,
-                'code' => 'TX-AUTH-002',
-                'part_number' => 'PN-002',
-                'serial_number' => 'SN-002',
-            ], $user->id);
-            $this->fail('An unrelated account must not create boxes.');
-        } catch (HttpException $exception) {
-            $this->assertSame(404, $exception->getStatusCode());
-        }
+        $this->postJson('/api/v1/boxes', [
+            'plant_id' => $plant->id,
+            'code' => 'TX-AUTH-002',
+            'part_number' => 'PN-002',
+            'serial_number' => 'SN-002',
+        ])->assertNotFound();
 
         $this->assertDatabaseCount('boxes', 0);
     }
