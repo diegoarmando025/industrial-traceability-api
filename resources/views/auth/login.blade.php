@@ -6,31 +6,38 @@
     <title>Acceso · PlantCore Traceability</title>
     @vite(['resources/css/industrial.css', 'resources/js/industrial.js'])
 </head>
-<body class="login-page bg-body-tertiary">
-    <main class="login-box">
-        <div class="card card-outline card-primary shadow-sm">
-            <div class="card-header text-center py-3"><strong>PlantCore Traceability</strong></div>
-            <div class="card-body">
-                <h1 class="h5 mb-2">Acceso a producción</h1>
-                <div class="alert alert-info small">Explora el sistema completo con datos ficticios: registra cajas, valida lecturas, revisa historiales y prueba la liberación.</div>
-                <form method="POST" action="{{ route('portfolio.demo.enter') }}" class="mb-3">@csrf<button type="submit" class="btn btn-success w-100">Entrar como administrador demo</button></form>
-                <div class="text-center text-secondary small mb-3">O inicia sesión con tus credenciales privadas</div>
-                <form method="POST" action="{{ route('login.store') }}">
-                    @csrf
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Correo electrónico</label>
-                        <input id="email" name="email" type="email" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" autocomplete="username" required autofocus>
-                        @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                    </div>
-                    <div class="mb-4">
-                        <label for="password" class="form-label">Contraseña</label>
-                        <input id="password" name="password" type="password" class="form-control @error('password') is-invalid @enderror" autocomplete="current-password" required>
-                        @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                    </div>
-                    <button class="btn btn-primary w-100" type="submit">Iniciar sesión</button>
-                </form>
-            </div>
+<body class="bg-body-tertiary portfolio-login-page">
+<main class="portfolio-login-shell">
+    <section class="portfolio-login-story" aria-label="Descripción del sistema">
+        <div class="portfolio-login-brand"><i class="bi bi-upc-scan me-2"></i> PlantCore <span>Traceability</span></div>
+        <div>
+            <div class="portfolio-login-eyebrow">TRAZABILIDAD INDUSTRIAL</div>
+            <h1>Controla cada lectura. Libera con evidencia.</h1>
+            <p>Explora el registro de cajas, validaciones de etiquetas, liberación autorizada e historial de operaciones en una aplicación funcional.</p>
+            <div class="portfolio-login-features"><span><i class="bi bi-check-circle me-2"></i> Validación de escaneos</span><span><i class="bi bi-check-circle me-2"></i> Permisos por planta</span><span><i class="bi bi-check-circle me-2"></i> Reportes y API REST</span></div>
         </div>
-    </main>
+        <div class="portfolio-login-footer">Demostración técnica · Datos ficticios</div>
+    </section>
+    <section class="portfolio-login-panel" aria-label="Acceso a la aplicación">
+        <div class="portfolio-login-form">
+            <div class="portfolio-login-eyebrow">ACCESO AL SISTEMA</div>
+            <h2 class="h3 fw-semibold mb-2">Explora la operación</h2>
+            <p class="text-secondary mb-4">Utiliza el acceso de evaluación para recorrer las funciones sin solicitar una cuenta.</p>
+            @if($errors->any())<div class="alert alert-danger" role="alert">{{ $errors->first() }}</div>@endif
+            <form method="POST" action="{{ route('portfolio.demo.enter') }}">
+                @csrf
+                <button type="submit" class="btn btn-primary btn-lg w-100"><i class="bi bi-arrow-right-circle me-2"></i> Entrar al demo interactivo</button>
+            </form>
+            <p class="small text-secondary mt-2 mb-4">Entorno compartido. No introduzcas información personal ni de clientes.</p>
+            <div class="portfolio-login-divider"><span>Acceso privado</span></div>
+            <form method="POST" action="{{ route('login.store') }}">
+                @csrf
+                <div class="mb-3"><label for="email" class="form-label">Correo electrónico</label><input id="email" name="email" type="email" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" autocomplete="username" required>@error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror</div>
+                <div class="mb-4"><label for="password" class="form-label">Contraseña</label><input id="password" name="password" type="password" class="form-control @error('password') is-invalid @enderror" autocomplete="current-password" required>@error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror</div>
+                <button class="btn btn-outline-primary w-100" type="submit">Iniciar sesión</button>
+            </form>
+        </div>
+    </section>
+</main>
 </body>
 </html>
