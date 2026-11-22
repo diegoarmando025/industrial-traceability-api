@@ -12,7 +12,7 @@ class Plant extends Model
 
     protected function casts(): array
     {
-        return ['validation_rules' => 'array'];
+        return ['validation_rules' => 'array', 'validation_rules_version' => 'integer'];
     }
 
     public function users(): BelongsToMany

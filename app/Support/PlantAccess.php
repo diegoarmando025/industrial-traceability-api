@@ -11,6 +11,7 @@ class PlantAccess
         'create' => ['operator', 'supervisor'],
         'scan' => ['operator', 'supervisor'],
         'release' => ['supervisor'],
+        'configure' => ['supervisor'],
     ];
 
     public function authorize(User $user, int $plantId, string $action): void

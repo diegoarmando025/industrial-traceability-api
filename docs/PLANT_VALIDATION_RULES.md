@@ -31,27 +31,25 @@ newly created boxes only.
 Existing boxes without a snapshot retain the original fixed three-scan behavior.
 This avoids retroactively allowing release after a profile change.
 
-## Administrative configuration (no public endpoint)
+## Supervisor configuration UI
 
-The first phase does not expose a route for changing profiles. A trusted
-administrator may provision a fictional plant locally using Tinker:
+After authentication, a **supervisor** can open `/plants/validation` from the
+sidebar, select a plant where they hold the supervisor role, and edit its required
+scan types and label prefix. Operators and viewers cannot access these views or
+modify profiles. Other-plant profile URLs return 404.
 
-```php
-$plant = \App\Models\Plant::where('code', 'DEMO-QRO')->firstOrFail();
-$rules = \App\Support\BoxValidationRules::normalize([
-    'required_scans' => ['part_number', 'package_label'],
-    'package_label_prefix' => 'PACK',
-]);
-$plant->update(['validation_rules' => $rules]);
-```
+Every effective change is recorded in `plant_validation_rule_changes`, including:
+plant, actor, version, previous rules, new rules and timestamp. The UI shows
+the recent change history. A version check under a database row lock prevents
+stale forms from silently overwriting another supervisor's changes.
 
-Use this procedure only with an authorized plant and after verifying the target
-database. Do not apply changes to an active production plant without reviewing
-open boxes, event history and rollback plans.
+Identical updates do not generate history entries. Saving new rules does not
+change snapshots already stored on boxes. The public showcase is unaffected and
+does not allow profile editing.
 
 ## Deployment
 
-One additive migration, no Vite changes:
+Two additive migrations across v2 phases; this UI phase adds one migration for versioning and audit history. No Vite changes (Blade views only):
 
 ```bash
 php artisan migrate --force
