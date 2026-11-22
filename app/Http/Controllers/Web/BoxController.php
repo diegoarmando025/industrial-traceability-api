@@ -68,7 +68,7 @@ class BoxController extends Controller
 
         $profiles = \App\Models\PlantCustomerProfile::query()
             ->whereIn('plant_id', $plants->pluck('id'))
-            ->where('active', true)->orderBy('code')->get();
+            ->where('active', true)->with('plant:id,code')->orderBy('code')->get();
 
         return view('boxes.create', compact('plants', 'profiles'));
     }
@@ -92,7 +92,7 @@ class BoxController extends Controller
     public function show(Request $request, Box $box): View
     {
         $this->access->authorize($request->user(), (int) $box->plant_id, 'read');
-        $box->load('plant:id,code,name');
+        $box->load('plant:id,code,name', 'customerProfile:id,code');
         $scans = $box->scans()->with('user:id,name')->orderByDesc('id')->limit(20)->get();
         $events = $box->events()->with('user:id,name')->orderByDesc('id')->limit(20)->get();
 
