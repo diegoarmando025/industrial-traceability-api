@@ -34,5 +34,5 @@
 <tr><td class="fw-semibold">{{ $box->code }}</td><td><span class="badge {{ $box->status === 'released' ? 'text-bg-success' : 'text-bg-warning' }}">{{ $box->status === 'released' ? 'Liberada' : 'Pendiente' }}</span></td><td class="text-end"><a class="btn btn-sm btn-outline-secondary" href="{{ route('boxes.show', $box->id) }}">Abrir</a></td></tr>
 @empty<tr><td colspan="3" class="text-center text-secondary py-4">No hay cajas visibles. Registra una para iniciar el flujo.</td></tr>@endforelse
 </tbody></table></div></div></div>
-<p class="small text-secondary">DevAlejandre · Traceability es una aplicación funcional de portafolio con interfaz web, autenticación, permisos por planta y API REST. No incluye aún suscripciones ni separación multiempresa para ofrecerse como SaaS comercial.</p>
+<div class="portfolio-next-step d-flex flex-wrap justify-content-between align-items-center gap-3 mt-4"><div><strong>¿Buscas trazabilidad para una operación específica?</strong><p class="small text-secondary mb-0">Explora validación de etiquetas, autorizaciones por planta, historial auditable y API REST. Las integraciones y ampliaciones pueden definirse según los procesos del proyecto.</p></div><a href="https://devalejandre.com" class="btn btn-outline-primary" rel="noopener">Conocer DevAlejandre</a></div>
 @endsection
