@@ -40,20 +40,20 @@ class TraceabilityPublicDemoSeeder extends Seeder
                     ['serial_number', 'SN-004201'],
                     ['package_label', 'BOX:TRACE-PUBLIC-001:PN-ENS-104:SN-004201'],
                 ] as [$type, $value]) {
-                    $service->scan($released, $type, $value, $operator->id);
+                    $service->scan($released, $type, $value, $operator->id, trustedFixture: true);
                 }
-                $service->release($released, $supervisor->id);
+                $service->release($released, $supervisor->id, trustedFixture: true);
             }
 
             $blocked = $this->newBox($service, $plant, 'TRACE-PUBLIC-002', 'PN-ENS-205', 'SN-004202', $operator);
             if ($blocked->status === 'pending' && ! $blocked->scans()->exists()) {
-                $service->scan($blocked, 'part_number', 'PN-ENS-999', $operator->id);
-                $service->release($blocked, $supervisor->id);
+                $service->scan($blocked, 'part_number', 'PN-ENS-999', $operator->id, trustedFixture: true);
+                $service->release($blocked, $supervisor->id, trustedFixture: true);
             }
 
             $inProgress = $this->newBox($service, $plant, 'TRACE-PUBLIC-003', 'PN-ENS-306', 'SN-004203', $operator);
             if ($inProgress->status === 'pending' && ! $inProgress->scans()->exists()) {
-                $service->scan($inProgress, 'part_number', 'PN-ENS-306', $operator->id);
+                $service->scan($inProgress, 'part_number', 'PN-ENS-306', $operator->id, trustedFixture: true);
             }
         });
     }
