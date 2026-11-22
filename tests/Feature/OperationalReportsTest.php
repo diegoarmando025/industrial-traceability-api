@@ -114,4 +114,21 @@ class OperationalReportsTest extends TestCase
         $this->actingAs($user)->get('/reports/operations')
             ->assertOk()->assertSee('Sin plantas asignadas');
     }
+    public function test_report_screen_omits_empty_activity_dates_but_csv_keeps_full_interval(): void
+    {
+        [$user] = $this->seedData();
+
+        $this->actingAs($user)->get('/reports/operations?from=2026-11-18&to=2026-11-20')
+            ->assertOk()
+            ->assertViewHas('activityDays', fn ($days) => count($days) === 2)
+            ->assertSee('Días con actividad');
+
+        $response = $this->actingAs($user)->get('/reports/operations/export?from=2026-11-18&to=2026-11-20');
+        $response->assertOk();
+        ob_start();
+        $response->sendContent();
+        $csv = ob_get_clean();
+        $this->assertStringContainsString('2026-11-18,0,0,0,0', $csv);
+    }
+
 }
