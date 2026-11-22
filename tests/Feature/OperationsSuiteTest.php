@@ -107,4 +107,39 @@ class OperationsSuiteTest extends TestCase
         $this->actingAs($owner)->delete('/team/'.$user->id,['plant_id'=>$plant->id])->assertRedirect();
         $this->assertDatabaseMissing('plant_user',['user_id'=>$user->id,'plant_id'=>$plant->id]);
     }
+
+    public function test_owner_can_create_plant_and_assign_existing_member(): void
+    {
+        [$plant,$owner] = $this->setupUser('supervisor',true);
+        $member = User::factory()->create();
+        $this->actingAs($owner)->post('/team/plants', [
+            'code'=>'QRO-02', 'name'=>'Planta Querétaro II',
+        ])->assertRedirect('/team');
+        $created = Plant::where('code','QRO-02')->firstOrFail();
+        $this->assertDatabaseHas('plant_user',[
+            'plant_id'=>$created->id,'user_id'=>$owner->id,'role'=>'supervisor',
+        ]);
+        $this->actingAs($owner)->post('/team/assign', [
+            'user_id'=>$member->id,'plant_id'=>$created->id,'role'=>'operator',
+        ])->assertRedirect('/team');
+        $this->assertDatabaseHas('plant_user',[
+            'plant_id'=>$created->id,'user_id'=>$member->id,'role'=>'operator',
+        ]);
+        $this->actingAs($member)->post('/team/plants',[
+            'code'=>'HACK-01','name'=>'No permitido',
+        ])->assertForbidden();
+    }
+
+    public function test_demo_user_cannot_be_assigned_to_other_plant(): void
+    {
+        [$plant,$owner] = $this->setupUser('supervisor',true);
+        $demo = User::factory()->create();
+        $demo->is_portfolio_demo_admin = true; $demo->save();
+        $this->actingAs($owner)->post('/team/assign',[
+            'user_id'=>$demo->id,'plant_id'=>$plant->id,'role'=>'supervisor',
+        ])->assertForbidden();
+        $this->assertDatabaseMissing('plant_user',[
+            'user_id'=>$demo->id,'plant_id'=>$plant->id,
+        ]);
+    }
 }
