@@ -1,10 +1,10 @@
-# PlantCore Traceability — Web + REST API
+# DevAlejandre Traceability — Web + REST API
 
 Laravel application for registering production boxes, validating scanned identifiers, and controlling their release through a web interface and a versioned REST API.
 
 Built as an independent, fictional industrial workflow demonstration. It does not include customer data, proprietary validation rules, or code from a production system.
 
-**Live interactive demo:** [Open Traceability](https://traceability.devalejandre.com/login) and choose **Entrar como administrador demo**. Create fictional boxes, scan valid or invalid identifiers, release a validated box, and consult history and operational reports. The visitor uses the real app with plant-scoped permissions and shared fictional data; no confidential customer records are included.
+**Live interactive demo:** [Open Traceability](https://traceability.devalejandre.com/login) and choose **Entrar al demo interactivo**. Create fictional boxes, scan valid or invalid identifiers, release a validated box, and consult history and operational reports. The visitor uses the real app with plant-scoped permissions and shared fictional data; no confidential customer records are included.
 
 [Reviewer walkthrough](docs/INTERACTIVE_PORTFOLIO_DEMO.md) · [OpenAPI specification](docs/openapi.json) · [LPA live demo](https://lpa.devalejandre.com/login) · [Service Desk live demo](https://service-desk.devalejandre.com/login).
 

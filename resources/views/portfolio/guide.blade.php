@@ -4,7 +4,7 @@
 @section('content')
 <section class="portfolio-hero mb-4">
  <div class="d-flex flex-column flex-lg-row gap-3 justify-content-between align-items-lg-center">
-  <div><div class="portfolio-eyebrow mb-2"><i class="bi bi-upc-scan me-1"></i> PLANTCORE / TRAZABILIDAD INDUSTRIAL</div>
+  <div><div class="portfolio-eyebrow mb-2"><i class="bi bi-upc-scan me-1"></i> DEVALEJANDRE / TRAZABILIDAD INDUSTRIAL</div>
    <h2 class="h3 fw-semibold mb-2">Valida cada lectura antes de liberar una caja.</h2>
    <p class="mb-0 portfolio-subtitle">Registra cajas, prueba las reglas de validación, detecta errores y consulta la trazabilidad completa desde el mismo sistema.</p>
   </div>
@@ -34,5 +34,5 @@
 <tr><td class="fw-semibold">{{ $box->code }}</td><td><span class="badge {{ $box->status === 'released' ? 'text-bg-success' : 'text-bg-warning' }}">{{ $box->status === 'released' ? 'Liberada' : 'Pendiente' }}</span></td><td class="text-end"><a class="btn btn-sm btn-outline-secondary" href="{{ route('boxes.show', $box->id) }}">Abrir</a></td></tr>
 @empty<tr><td colspan="3" class="text-center text-secondary py-4">No hay cajas visibles. Registra una para iniciar el flujo.</td></tr>@endforelse
 </tbody></table></div></div></div>
-<p class="small text-secondary">PlantCore Traceability es una aplicación funcional de portafolio con interfaz web, autenticación, permisos por planta y API REST. No incluye aún suscripciones ni separación multiempresa para ofrecerse como SaaS comercial.</p>
+<p class="small text-secondary">DevAlejandre · Traceability es una aplicación funcional de portafolio con interfaz web, autenticación, permisos por planta y API REST. No incluye aún suscripciones ni separación multiempresa para ofrecerse como SaaS comercial.</p>
 @endsection

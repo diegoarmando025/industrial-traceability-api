@@ -3,13 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Acceso · PlantCore Traceability</title>
+    <title>Traceability · DevAlejandre</title>
+    <link rel="icon" href="https://devalejandre.com/assets/brand/favicon.ico" sizes="any">
     @vite(['resources/css/industrial.css', 'resources/js/industrial.js'])
 </head>
 <body class="bg-body-tertiary portfolio-login-page">
 <main class="portfolio-login-shell">
     <section class="portfolio-login-story" aria-label="Descripción del sistema">
-        <div class="portfolio-login-brand"><i class="bi bi-upc-scan me-2"></i> PlantCore <span>Traceability</span></div>
+        <div class="da-story-brand"><a class="da-logo-plate" href="https://devalejandre.com" aria-label="DevAlejandre"><img src="https://devalejandre.com/assets/brand/DevAlejandre_logo.svg" alt="DevAlejandre" width="194" height="36"></a><span class="da-product-label">Traceability</span></div>
         <div>
             <div class="portfolio-login-eyebrow">TRAZABILIDAD INDUSTRIAL</div>
             <h1>Controla cada lectura. Libera con evidencia.</h1>
