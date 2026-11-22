@@ -63,7 +63,7 @@ Use screenshots from the running application (not mockups): dashboard, list of b
 
 ## Architectural boundaries
 
-This sample is not a deployed MES or production-ready identity service. There is no public hosted instance, ERP integration, production scanner connection or third-party customer data. Consult the [technical case study](portfolio-case-study.md) for access rules and known constraints.
+The public demonstration showcases core box-validation and release workflows using fictional records. Integration with scanners, ERP/MES systems, and identity providers requires project-specific implementation and verification. Consult the [technical case study](portfolio-case-study.md) for architecture and integration boundaries.
 
 ## Related independent project
 
