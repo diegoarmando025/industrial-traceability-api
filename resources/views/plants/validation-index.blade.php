@@ -15,7 +15,7 @@
                         <td><div class="fw-semibold">{{ $plant->code }}</div><div class="text-secondary small">{{ $plant->name }}</div></td>
                         <td>{{ count($rules['required_scans']) }} de 3</td>
                         <td><code>{{ $rules['package_label_prefix'] }}</code></td>
-                        <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{{ route('plants.validation.edit', $plant) }}">Configurar</a></td>
+                        <td class="text-end"><div class="d-flex gap-2 justify-content-end"><a class="btn btn-sm btn-outline-primary" href="{{ route('plants.validation.edit', $plant) }}">Reglas base</a><a class="btn btn-sm btn-outline-secondary" href="{{ route('plants.customers.index', $plant) }}">Perfiles de cliente</a></div></td>
                     </tr>
                 @endforeach
                 </tbody>
