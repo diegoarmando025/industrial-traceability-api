@@ -44,6 +44,13 @@
                         <div class="form-text">Ejemplo: <code>PACK:CAJA-001:PN-100:SN-200</code>. Usa de 1 a 16 letras mayúsculas, números, guiones o guion bajo.</div>
                         @error('package_label_prefix')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
+                    <div class="mb-4"><label class="form-label" for="package_label_format">Formato de etiqueta de empaque</label>
+                        <select class="form-select" id="package_label_format" name="package_label_format">
+                            <option value="colon" @selected(old('package_label_format', $rules['package_label_format'] ?? 'colon') === 'colon')>Estándar: PREFIJO:CAJA:PARTE:SERIE</option>
+                            <option value="pipe" @selected(old('package_label_format', $rules['package_label_format'] ?? 'colon') === 'pipe')>Alternativo: PREFIJO|PARTE|SERIE|CAJA</option>
+                        </select>
+                        <div class="form-text">Se aplica únicamente a cajas nuevas; las anteriores conservan su formato.</div>
+                    </div>
                     <div class="d-flex flex-wrap gap-2">
                         <button class="btn btn-primary" type="submit">Guardar reglas</button>
                         <a class="btn btn-outline-secondary" href="{{ route('plants.validation.index') }}">Volver a plantas</a>
