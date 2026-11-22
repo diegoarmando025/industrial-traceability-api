@@ -42,6 +42,9 @@
                     <li class="nav-item"><a href="{{ route('portfolio.guide') }}" class="nav-link {{ request()->routeIs('portfolio.guide') ? 'active' : '' }}"><i class="nav-icon bi bi-compass"></i><p>Guía de evaluación</p></a></li>
                     <li class="nav-item"><a href="{{ route('boxes.index') }}" class="nav-link {{ request()->routeIs('boxes.*') ? 'active' : '' }}"><i class="nav-icon bi bi-box-seam"></i><p>Cajas</p></a></li>
                     <li class="nav-item"><a href="{{ route('reports.operations.index') }}" class="nav-link {{ request()->routeIs('reports.operations.*') ? 'active' : '' }}"><i class="nav-icon bi bi-bar-chart-line"></i><p>Reportes</p></a></li>
+                    @if(auth()->user()->is_portfolio_owner)
+                        <li class="nav-item"><a href="{{ route('team.index') }}" class="nav-link {{ request()->routeIs('team.*') ? 'active' : '' }}"><i class="nav-icon bi bi-people"></i><p>Equipo y permisos</p></a></li>
+                    @endif
                     @if(auth()->user()->plants()->wherePivot('role', 'supervisor')->exists())
                         <li class="nav-item"><a href="{{ route('plants.validation.index') }}" class="nav-link {{ request()->routeIs('plants.validation.*') ? 'active' : '' }}"><i class="nav-icon bi bi-sliders"></i><p>Reglas de validación</p></a></li>
                     @endif
