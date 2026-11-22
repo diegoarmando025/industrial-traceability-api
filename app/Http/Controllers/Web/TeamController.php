@@ -29,7 +29,8 @@ class TeamController extends Controller
                 'users.is_portfolio_demo_admin', 'plants.id as plant_id', 'plants.name as plant_name',
                 'plant_user.role')
             ->orderBy('users.name')->orderBy('plants.name')->get();
-        return view('team.index', compact('plants', 'memberships'));
+        $users = User::query()->where('is_portfolio_owner', false)->where('is_portfolio_demo_admin', false)->orderBy('name')->get(['id', 'name', 'email']);
+        return view('team.index', compact('plants', 'memberships', 'users'));
     }
 
     public function store(Request $request): RedirectResponse
