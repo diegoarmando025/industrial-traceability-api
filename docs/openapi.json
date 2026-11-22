@@ -71,6 +71,12 @@
                     "type": "string",
                     "maxLength": 80,
                     "example": "SN-200"
+                  },
+                  "customer_profile_id": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 1,
+                    "description": "Optional active customer profile belonging to the selected plant."
                   }
                 }
               }
@@ -590,6 +596,10 @@
           "updated_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "customer_profile_id": {
+            "type": "integer",
+            "nullable": true
           }
         }
       },
