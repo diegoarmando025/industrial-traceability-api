@@ -12,6 +12,9 @@
             <div class="card-header text-center py-3"><strong>PlantCore Traceability</strong></div>
             <div class="card-body">
                 <h1 class="h5 mb-2">Acceso a producción</h1>
+                <div class="alert alert-info small">Explora el sistema completo con datos ficticios: registra cajas, valida lecturas, revisa historiales y prueba la liberación.</div>
+                <form method="POST" action="{{ route('portfolio.demo.enter') }}" class="mb-3">@csrf<button type="submit" class="btn btn-success w-100">Entrar como administrador demo</button></form>
+                <div class="text-center text-secondary small mb-3">O inicia sesión con tus credenciales privadas</div>
                 <form method="POST" action="{{ route('login.store') }}">
                     @csrf
                     <div class="mb-3">
