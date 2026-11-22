@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Producción') · PlantCore Traceability</title>
+    <title>@yield('title', 'Traceability') · DevAlejandre</title>
+    <link rel="icon" href="https://devalejandre.com/assets/brand/favicon.ico" sizes="any">
     @vite(['resources/css/industrial.css', 'resources/js/industrial.js'])
 </head>
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
@@ -28,7 +29,7 @@
     <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
         <div class="sidebar-brand">
             <a href="{{ route('dashboard') }}" class="brand-link text-decoration-none">
-                <span class="brand-text fw-semibold">PlantCore <span class="fw-normal">Traceability</span></span>
+                <span class="da-sidebar-brand"><span class="da-sidebar-logo"><img src="https://devalejandre.com/assets/brand/DevAlejandre_logo.svg" alt="DevAlejandre" width="130" height="28"></span><span class="da-sidebar-product">Traceability</span></span>
             </a>
         </div>
         <div class="sidebar-wrapper">
