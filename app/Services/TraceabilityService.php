@@ -20,7 +20,6 @@ class TraceabilityService
     {
         return DB::transaction(function () use ($data, $userId): Box {
             $plant = Plant::query()->findOrFail($data['plant_id']);
-            app(PlantAccess::class)->authorize(User::query()->findOrFail($userId), (int) $plant->id, 'create');
             $profile = null;
             if (! empty($data['customer_profile_id'])) {
                 $profile = PlantCustomerProfile::query()
