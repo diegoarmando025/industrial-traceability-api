@@ -5,6 +5,7 @@ use App\Http\Controllers\Web\BoxController;
 use App\Http\Controllers\Web\BoxHistoryController;
 use App\Http\Controllers\Web\SessionController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PortfolioDemoController;
 use App\Http\Controllers\Web\PublicDemoController;
 use App\Http\Controllers\Web\PlantValidationRulesController;
 use App\Http\Controllers\Web\PlantCustomerProfileController;
@@ -16,12 +17,15 @@ Route::middleware('throttle:60,1')->group(function (): void {
     Route::get('/demo/boxes/{box}', [PublicDemoController::class, 'show'])->name('traceability.demo.show');
 });
 
+Route::middleware(['guest', 'throttle:12,1'])->post('/demo/entrar', [PortfolioDemoController::class, 'enter'])->name('portfolio.demo.enter');
+
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', [SessionController::class, 'create'])->name('login');
     Route::post('/login', [SessionController::class, 'store'])->name('login.store');
 });
 
 Route::middleware('auth')->group(function (): void {
+    Route::get('/guia', [PortfolioDemoController::class, 'guide'])->name('portfolio.guide');
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::get('/plants/validation', [PlantValidationRulesController::class, 'index'])->name('plants.validation.index');
     Route::get('/plants/{plant}/validation', [PlantValidationRulesController::class, 'edit'])->name('plants.validation.edit');
