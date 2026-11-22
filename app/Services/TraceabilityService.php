@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Box;
 use App\Models\Plant;
+use App\Models\PlantCustomerProfile;
 use App\Support\BoxValidationRules;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -16,12 +17,27 @@ class TraceabilityService
     {
         return DB::transaction(function () use ($data, $userId): Box {
             $plant = Plant::query()->findOrFail($data['plant_id']);
-            $rules = BoxValidationRules::normalize($plant->validation_rules);
-            $box = Box::query()->create($data + ['status' => 'pending', 'validation_rules' => $rules]);
+            $profile = null;
+            if (! empty($data['customer_profile_id'])) {
+                $profile = PlantCustomerProfile::query()
+                    ->where('plant_id', $plant->id)
+                    ->where('active', true)
+                    ->findOrFail($data['customer_profile_id']);
+            }
+            $rules = BoxValidationRules::normalize($profile?->validation_rules ?? $plant->validation_rules);
+            $box = Box::query()->create([
+                'plant_id' => $plant->id,
+                'customer_profile_id' => $profile?->id,
+                'code' => $data['code'],
+                'part_number' => $data['part_number'],
+                'serial_number' => $data['serial_number'],
+                'status' => 'pending',
+                'validation_rules' => $rules,
+            ]);
             $box->events()->create([
                 'user_id' => $userId,
                 'event_type' => 'created',
-                'details' => ['code' => $box->code],
+                'details' => ['code' => $box->code, 'customer_profile_id' => $profile?->id],
                 'created_at' => now(),
             ]);
             return $box;
