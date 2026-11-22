@@ -6,6 +6,7 @@ use App\Http\Controllers\Web\SessionController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\PublicDemoController;
 use App\Http\Controllers\Web\PlantValidationRulesController;
+use App\Http\Controllers\Web\PlantCustomerProfileController;
 
 Route::redirect('/', '/dashboard');
 
@@ -24,6 +25,9 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/plants/validation', [PlantValidationRulesController::class, 'index'])->name('plants.validation.index');
     Route::get('/plants/{plant}/validation', [PlantValidationRulesController::class, 'edit'])->name('plants.validation.edit');
     Route::put('/plants/{plant}/validation', [PlantValidationRulesController::class, 'update'])->name('plants.validation.update');
+    Route::get('/plants/{plant}/customers', [PlantCustomerProfileController::class, 'index'])->name('plants.customers.index');
+    Route::post('/plants/{plant}/customers', [PlantCustomerProfileController::class, 'store'])->name('plants.customers.store');
+    Route::post('/plants/{plant}/customers/{profile}/deactivate', [PlantCustomerProfileController::class, 'deactivate'])->name('plants.customers.deactivate');
     Route::post('/logout', [SessionController::class, 'destroy'])->name('logout');
     Route::get('/boxes', [BoxController::class, 'index'])->name('boxes.index');
     Route::get('/boxes/create', [BoxController::class, 'create'])->name('boxes.create');
