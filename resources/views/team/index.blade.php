@@ -4,6 +4,23 @@
 @section('content')
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 @if($errors->any())<div class="alert alert-danger"><ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+<div class="card mb-4">
+    <div class="card-header"><h2 class="h5 mb-0">Escenarios de trazabilidad</h2></div>
+    <div class="card-body">
+        <div class="d-flex flex-wrap gap-3 align-items-end justify-content-between">
+            <div>
+                <p class="mb-1"><strong>{{ $demoBoxCount }}</strong> cajas ficticias en el escenario de evaluación.</p>
+                <p class="small text-secondary mb-0">Agrega ejemplos de rechazo, corrección, liberación bloqueada y liberación completada. Los registros existentes no se reinician ni modifican.</p>
+            </div>
+            <form class="d-flex flex-wrap align-items-end gap-2" method="POST" action="{{ route('team.demo-scenario.complete') }}">
+                @csrf
+                <div><label class="form-label" for="demo_confirmation">Escribe COMPLETAR DEMO</label><input class="form-control" id="demo_confirmation" name="confirmation" required maxlength="14" pattern="COMPLETAR DEMO" placeholder="COMPLETAR DEMO" autocomplete="off"></div>
+                <button class="btn btn-outline-primary" type="submit">Completar escenario</button>
+            </form>
+        </div>
+        @error('demo_scenario')<div class="alert alert-danger mt-3 mb-0">{{ $message }}</div>@enderror
+    </div>
+</div>
 <div class="row g-3 mb-4">
 <div class="col-lg-5"><div class="card h-100"><div class="card-header"><h2 class="h5 mb-0">Nuevo integrante</h2></div><div class="card-body">
 <form method="POST" action="{{ route('team.store') }}">@csrf

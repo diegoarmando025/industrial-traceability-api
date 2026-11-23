@@ -66,7 +66,7 @@ class PublicTraceabilityDemoTest extends TestCase
         $this->seed(TraceabilityPublicDemoSeeder::class);
 
         $plant = Plant::query()->where('code', 'TRACE-PUBLIC')->firstOrFail();
-        $this->assertSame(3, Box::query()->where('plant_id', $plant->id)->count());
+        $this->assertSame(8, Box::query()->where('plant_id', $plant->id)->count());
 
         $released = Box::query()->where('code', 'TRACE-PUBLIC-001')->firstOrFail();
         $this->assertSame('released', $released->status);
@@ -77,6 +77,29 @@ class PublicTraceabilityDemoTest extends TestCase
         $this->assertSame('pending', $blocked->status);
         $this->assertSame(1, $blocked->scans()->count());
         $this->assertSame(2, $blocked->events()->count());
+
+
+        $corrected = Box::query()->where('code', 'TRACE-PUBLIC-004')->firstOrFail();
+        $this->assertSame('pending', $corrected->status);
+        $this->assertSame(3, $corrected->scans()->count());
+        $this->assertSame(1, $corrected->scans()->where('accepted', false)->count());
+
+        $ready = Box::query()->where('code', 'TRACE-PUBLIC-005')->firstOrFail();
+        $this->assertSame('pending', $ready->status);
+        $this->assertSame(3, $ready->scans()->where('accepted', true)->count());
+
+        $blocked = Box::query()->where('code', 'TRACE-PUBLIC-006')->firstOrFail();
+        $this->assertSame('pending', $blocked->status);
+        $this->assertSame(1, $blocked->events()->where('event_type', 'release_blocked')->count());
+
+        $recovered = Box::query()->where('code', 'TRACE-PUBLIC-007')->firstOrFail();
+        $this->assertSame('released', $recovered->status);
+        $this->assertSame(1, $recovered->scans()->where('accepted', false)->count());
+        $this->assertSame(1, $recovered->events()->where('event_type', 'released')->count());
+
+        $new = Box::query()->where('code', 'TRACE-PUBLIC-008')->firstOrFail();
+        $this->assertSame('pending', $new->status);
+        $this->assertSame(0, $new->scans()->count());
 
         $this->assertSame(0, User::query()->where('email', 'public-operator@traceability.example.invalid')
             ->firstOrFail()->plants()->count());

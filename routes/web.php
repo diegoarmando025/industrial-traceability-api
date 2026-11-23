@@ -13,6 +13,7 @@ use App\Http\Controllers\PortfolioDemoController;
 use App\Http\Controllers\Web\PublicDemoController;
 use App\Http\Controllers\Web\PlantValidationRulesController;
 use App\Http\Controllers\Web\PlantCustomerProfileController;
+use App\Http\Controllers\Web\PortfolioScenarioMaintenanceController;
 
 Route::redirect('/', '/dashboard');
 
@@ -46,6 +47,7 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/team/plants', [PlantAdministrationController::class, 'store'])->name('team.plants.store');
     Route::post('/team/assign', [PlantAdministrationController::class, 'assign'])->name('team.assign');
     Route::get('/team', [TeamController::class, 'index'])->name('team.index');
+    Route::post('/team/demo-scenario/complete', [PortfolioScenarioMaintenanceController::class, 'complete'])->middleware('throttle:3,1')->name('team.demo-scenario.complete');
     Route::post('/team', [TeamController::class, 'store'])->name('team.store');
     Route::put('/team/{user}', [TeamController::class, 'update'])->name('team.update');
     Route::delete('/team/{user}', [TeamController::class, 'revoke'])->name('team.revoke');

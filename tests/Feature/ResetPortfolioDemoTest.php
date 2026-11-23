@@ -38,7 +38,7 @@ class ResetPortfolioDemoTest extends TestCase
 
         $this->assertDatabaseMissing('boxes', ['code' => $visitor->code]);
         $this->assertDatabaseHas('boxes', ['code' => $real->code, 'plant_id' => $other->id]);
-        $this->assertSame(3, Box::where('plant_id', $demo->id)->count());
+        $this->assertSame(8, Box::where('plant_id', $demo->id)->count());
         $this->assertSame($users, User::count());
     }
 
@@ -49,6 +49,6 @@ class ResetPortfolioDemoTest extends TestCase
         $demo->validation_rules = ['required_scans' => ['part_number']];
         $demo->save();
         $this->artisan('portfolio:reset-demo --dry-run')->assertExitCode(1);
-        $this->assertSame(3, Box::where('plant_id', $demo->id)->count());
+        $this->assertSame(8, Box::where('plant_id', $demo->id)->count());
     }
 }

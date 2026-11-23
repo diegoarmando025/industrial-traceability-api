@@ -31,7 +31,7 @@ Inspect your private `.env` and confirm Traceability's dedicated DB is selected.
 /opt/alt/php84/usr/bin/php artisan traceability:public-demo-seed --force
 ```
 
-Creates three fictional boxes: `TRACE-PUBLIC-001` fully validated and released, `TRACE-PUBLIC-002` with a rejected part number and blocked release, and `TRACE-PUBLIC-003` partially validated. Re-running does not duplicate events.
+Creates eight fictional boxes with distinct, traceable situations: `001` completed/released, `002` rejected and blocked, `003` partially validated, `004` rejected then corrected, `005` validated but awaiting release, `006` invalid package label and blocked release, `007` rejected/corrected/released, and `008` new with no scans. Re-running does not duplicate existing records or replay events.
 
 Now edit `apps/traceability/.env`:
 
@@ -46,7 +46,7 @@ Refresh the configuration:
 ```
 
 Open `https://traceability.devalejandre.com/demo` in an incognito window and verify:
-- All three fictitious boxes are shown and the status filter works.
+- All eight fictitious boxes are shown and the status filter works.
 - The released box shows three accepted scans and a release event.
 - The blocked box shows a rejected scan and a blocked-release event.
 - The incomplete box is still pending.
@@ -56,6 +56,10 @@ Open `https://traceability.devalejandre.com/demo` in an incognito window and ver
 - DevAlejandre and LPA continue working normally.
 
 No new database migrations, npm dependencies or Vite build steps are required for this update. Public views use independent inline CSS and the existing Laravel runtime.
+
+## Add examples through the protected web administration
+
+The authenticated protected owner can also open **Team and permissions**, enter the exact confirmation phrase `COMPLETAR DEMO`, and select **Completar escenario**. This is additive: it does not restore or delete existing shared fictitious boxes, and it is unavailable to the public evaluation administrator. Back up the database before any production data maintenance.
 
 ## Emergency disable
 
