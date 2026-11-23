@@ -25,7 +25,10 @@ final class PortfolioScenarioMaintenanceTest extends TestCase
         $originalEvents = $original->events()->count();
 
         foreach (range(4, 8) as $number) {
-            Box::query()->where('code', 'TRACE-PUBLIC-'.str_pad((string) $number, 3, '0', STR_PAD_LEFT))->firstOrFail()->delete();
+            $example = Box::query()->where('code', 'TRACE-PUBLIC-'.str_pad((string) $number, 3, '0', STR_PAD_LEFT))->firstOrFail();
+            $example->scans()->delete();
+            $example->events()->delete();
+            $example->delete();
         }
         $this->assertSame(3, Box::query()->where('plant_id', $plant->id)->count());
 
