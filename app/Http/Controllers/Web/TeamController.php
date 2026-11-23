@@ -30,7 +30,8 @@ class TeamController extends Controller
                 'plant_user.role')
             ->orderBy('users.name')->orderBy('plants.name')->get();
         $users = User::query()->where('is_portfolio_owner', false)->where('is_portfolio_demo_admin', false)->orderBy('name')->get(['id', 'name', 'email']);
-        return view('team.index', compact('plants', 'memberships', 'users'));
+        $demoBoxCount = \App\Models\Box::query()->whereHas('plant', fn ($q) => $q->where('code', 'TRACE-PUBLIC'))->count();
+        return view('team.index', compact('plants', 'memberships', 'users', 'demoBoxCount'));
     }
 
     public function store(Request $request): RedirectResponse
