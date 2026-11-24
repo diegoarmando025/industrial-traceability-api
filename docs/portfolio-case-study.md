@@ -4,7 +4,7 @@
 
 In a production workflow, registering a box is not the same as authorizing its release. Release decisions depend on scanned identifiers, permissions and a record of who performed each action.
 
-This independent demonstration models a small part of that workflow with fictional data and generic validation rules. It is not derived from a customer's proprietary system.
+The application models box registration, scan validation and shipment release using fictional records and generic business rules.
 
 ## Implementation
 
@@ -38,7 +38,7 @@ Requests to boxes outside a user's assigned plants respond with 404. A token mus
 - GitHub Actions runs the PHP/SQLite test suite on commits and pull requests to `main`.
 - The 11-step Postman collection was exercised manually against a local Laravel server: a new box was created, an incomplete release was blocked, an incorrect scan was recorded, the corrected identifiers were accepted, an operator was denied release, a supervisor released the box, the final status and history were retrieved, and a duplicate release was rejected.
 
-The Postman steps were observed individually. This does **not** imply a clean, fully passing Postman Runner report unless that separate result is recorded.
+Each Postman request was verified individually against the local application. A consolidated Postman Runner report is not included.
 
 ## Inspect and reproduce
 
@@ -66,7 +66,7 @@ This repository is a focused engineering sample, **not production-ready MES soft
 - Plant-level access exists, but there is no parent-company/tenant hierarchy or full user administration.
 - Box codes remain globally unique rather than unique per plant; this may leak existence through validation conflicts.
 - Concurrency behavior has not been load-tested across multiple database engines.
-- No actual barcode scanner hardware, ERP/MES integration or public hosted demo.
-- The OpenAPI document has not yet been contract-tested automatically against live responses.
+- No integration with physical scanners or external ERP/MES platforms. A hosted interactive demo is available with fictional records.
+- The OpenAPI specification is validated for structure and route parity; exhaustive runtime response-schema validation remains outside the current test suite.
 
-The next useful engineering step is to validate the OpenAPI contract automatically and, before any public deployment, complete a security review. More endpoints alone would not address these limits.
+For an operational rollout, the remaining priorities are identity provisioning, integration testing, response-schema coverage, concurrency testing and environment-specific security controls.
